@@ -1,0 +1,53 @@
+# Build output
+bin/
+obj/
+out/
+publish/
+
+# Visual Studio / Rider / VS Code local state
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# .NET generated files
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+*.tlog
+*.nupkg
+*.snupkg
+*.xml
+
+# Keep source-controlled XML files in docs if any are added later.
+!docs/**/*.xml
+
+# Local app configuration and secrets
+appsettings.json
+appsettings.*.json
+!appsettings.example.json
+secrets.json
+
+# Database/export artifacts
+docs/export.sql
+*.bak
+*.bacpac
+*.dacpac
+
+# Runtime/upload/temp content
+uploads/
+logs/
+temp/
+tmp/
+dummy.txt
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+

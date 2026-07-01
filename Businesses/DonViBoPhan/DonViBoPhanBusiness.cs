@@ -1,0 +1,121 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using QlThietBi.DTO.Request;
+using QlThietBi.DTO.Response;
+using QlThietBi.Models;
+
+namespace QlThietBi.Businesses.DonViBoPhan
+{
+    public class DonViBoPhanBusiness : IDonViBoPhanBusiness
+    {
+        private readonly QlThietBiContext context;
+
+        public DonViBoPhanBusiness(QlThietBiContext context)
+        {
+            this.context = context;
+        }
+
+        public async Task<IEnumerable<DonViBoPhanDto>> GetUnitsAsync()
+        {
+            return await context.DonViBoPhans
+                .Where(x => x.IsActive)
+                .Select(x => new DonViBoPhanDto
+                {
+                    Id = x.Id,
+                    MaDonVi = x.MaDonVi,
+                    TenDonVi = x.TenDonVi,
+                    ParentId = x.ParentId,
+                    LoaiDonVi = x.LoaiDonVi,
+                    GhiChu = x.GhiChu,
+                    SapXep = x.SapXep,
+                    IsActive = x.IsActive
+                })
+                .ToListAsync();
+        }
+
+        public async Task<DonViBoPhanDto?> GetUnitByIdAsync(Guid id)
+        {
+            var entity = await context.DonViBoPhans.FindAsync(id);
+            if (entity == null)
+            {
+                return null;
+            }
+
+            return new DonViBoPhanDto
+            {
+                Id = entity.Id,
+                MaDonVi = entity.MaDonVi,
+                TenDonVi = entity.TenDonVi,
+                ParentId = entity.ParentId,
+                LoaiDonVi = entity.LoaiDonVi,
+                GhiChu = entity.GhiChu,
+                SapXep = entity.SapXep,
+                IsActive = entity.IsActive
+            };
+        }
+
+        public async Task<DonViBoPhanDto> SaveUnitAsync(CreateUpdateDonViBoPhanRequest request)
+        {
+            global::QlThietBi.Models.DonViBoPhan entity;
+            if (request.Id.HasValue)
+            {
+                entity = await context.DonViBoPhans.FindAsync(request.Id.Value) ?? throw new KeyNotFoundException("Đơn vị/bộ phận không tồn tại.");
+                entity.MaDonVi = request.MaDonVi;
+                entity.TenDonVi = request.TenDonVi;
+                entity.ParentId = request.ParentId;
+                entity.LoaiDonVi = request.LoaiDonVi;
+                entity.GhiChu = request.GhiChu;
+                entity.SapXep = request.SapXep;
+                entity.IsActive = request.IsActive;
+                entity.NgayChinhSuaCuoiCung = DateTime.UtcNow;
+            }
+            else
+            {
+                entity = new global::QlThietBi.Models.DonViBoPhan
+                {
+                    Id = Guid.NewGuid(),
+                    MaDonVi = request.MaDonVi,
+                    TenDonVi = request.TenDonVi,
+                    ParentId = request.ParentId,
+                    LoaiDonVi = request.LoaiDonVi,
+                    GhiChu = request.GhiChu,
+                    SapXep = request.SapXep,
+                    IsActive = request.IsActive,
+                    NgayKhoiTao = DateTime.UtcNow
+                };
+                context.DonViBoPhans.Add(entity);
+            }
+
+            await context.SaveChangesAsync();
+
+            return new DonViBoPhanDto
+            {
+                Id = entity.Id,
+                MaDonVi = entity.MaDonVi,
+                TenDonVi = entity.TenDonVi,
+                ParentId = entity.ParentId,
+                LoaiDonVi = entity.LoaiDonVi,
+                GhiChu = entity.GhiChu,
+                SapXep = entity.SapXep,
+                IsActive = entity.IsActive
+            };
+        }
+
+        public async Task<bool> DeleteUnitAsync(Guid id)
+        {
+            var entity = await context.DonViBoPhans.FindAsync(id);
+            if (entity == null)
+            {
+                return false;
+            }
+
+            entity.IsActive = false;
+            entity.NgayChinhSuaCuoiCung = DateTime.UtcNow;
+            await context.SaveChangesAsync();
+            return true;
+        }
+    }
+}
