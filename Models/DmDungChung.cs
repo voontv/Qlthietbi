@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 
 namespace QlThietBi.Models
 {
     public class DmDungChung
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string NhomDanhMuc { get; set; } = null!;
         public string Ma { get; set; } = null!;
         public string Ten { get; set; } = null!;
@@ -19,3 +19,5 @@ namespace QlThietBi.Models
         public string? TenNguoiChinhSua { get; set; }
     }
 }
+
+

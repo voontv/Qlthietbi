@@ -1,4 +1,4 @@
--- Thiết kế CSDL Quản lý thiết bị - SQL Server
+-- Thi?t k? CSDL Qu?n l� thi?t b? - SQL Server
 
 CREATE TABLE dbo.DmDungChung (
     Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWID(),
@@ -246,15 +246,15 @@ CREATE TABLE dbo.TepDinhKem (
 );
 GO
 
--- Seed trạng thái thiết bị mặc định
+-- Seed tr?ng th�i thi?t b? m?c d?nh
 INSERT INTO dbo.DmDungChung (NhomDanhMuc, Ma, Ten, SapXep)
 VALUES
-(N'TRANG_THAI_TB', N'MOI_NHAP', N'Mới nhập', 1),
+(N'TRANG_THAI_TB', N'MOI_NHAP', N'M?i nh?p', 1),
 (N'TRANG_THAI_TB', N'TRONG_KHO', N'Trong kho', 2),
-(N'TRANG_THAI_TB', N'DANG_SU_DUNG', N'Đang sử dụng', 3),
-(N'TRANG_THAI_TB', N'DANG_SUA_CHUA', N'Đang sửa chữa', 4),
-(N'TRANG_THAI_TB', N'DANG_BAO_TRI', N'Đang bảo trì/bảo dưỡng', 5),
-(N'TRANG_THAI_TB', N'CHO_THANH_LY', N'Chờ thanh lý', 6),
-(N'TRANG_THAI_TB', N'DA_THANH_LY', N'Đã thanh lý', 7),
-(N'TRANG_THAI_TB', N'MAT_HUY', N'Mất/Hủy', 8);
+(N'TRANG_THAI_TB', N'DANG_SU_DUNG', N'�ang s? d?ng', 3),
+(N'TRANG_THAI_TB', N'DANG_SUA_CHUA', N'�ang s?a ch?a', 4),
+(N'TRANG_THAI_TB', N'DANG_BAO_TRI', N'�ang b?o tr�/b?o du?ng', 5),
+(N'TRANG_THAI_TB', N'CHO_THANH_LY', N'Ch? thanh l�', 6),
+(N'TRANG_THAI_TB', N'DA_THANH_LY', N'�� thanh l�', 7),
+(N'TRANG_THAI_TB', N'MAT_HUY', N'M?t/H?y', 8);
 GO

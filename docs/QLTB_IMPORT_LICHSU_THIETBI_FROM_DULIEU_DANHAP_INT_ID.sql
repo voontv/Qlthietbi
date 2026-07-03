@@ -375,8 +375,8 @@ MERGE dbo.DonViBoPhan AS target
 USING UnitSource AS source
 ON target.MaDonVi = source.MaDonVi
 WHEN MATCHED THEN UPDATE SET TenDonVi = CASE WHEN target.LoaiDonVi = N'DON_VI_CHA_CU' OR target.TenDonVi LIKE N'Đơn vị cũ %' THEN source.TenDonVi ELSE target.TenDonVi END, IsActive = 1
-WHEN NOT MATCHED THEN INSERT (Id, MaDonVi, TenDonVi, LoaiDonVi, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-VALUES (NEWID(), source.MaDonVi, source.TenDonVi, N'PHONG_BAN_CU', 1, SYSDATETIME(), N'MIGRATION', N'Migration');
+WHEN NOT MATCHED THEN INSERT (MaDonVi, TenDonVi, LoaiDonVi, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+VALUES (source.MaDonVi, source.TenDonVi, N'PHONG_BAN_CU', 1, SYSDATETIME(), N'MIGRATION', N'Migration');
 
 ;WITH Users AS (
     SELECT MaNguoiDung, TenNguoiDung, MaPhongBan FROM #PhieuCu WHERE MaNguoiDung IS NOT NULL
@@ -389,8 +389,8 @@ MERGE dbo.NguoiSuDungThietBi AS target
 USING UserSource AS source
 ON target.MaNguoiDung = source.MaNguoiDung
 WHEN MATCHED THEN UPDATE SET TenNguoiDung = source.TenNguoiDung, DonViBoPhanId = COALESCE(target.DonViBoPhanId, source.DonViBoPhanId), IsActive = 1
-WHEN NOT MATCHED THEN INSERT (Id, MaNguoiDung, TenNguoiDung, DonViBoPhanId, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-VALUES (NEWID(), source.MaNguoiDung, source.TenNguoiDung, source.DonViBoPhanId, 1, SYSDATETIME(), N'MIGRATION', N'Migration');
+WHEN NOT MATCHED THEN INSERT (MaNguoiDung, TenNguoiDung, DonViBoPhanId, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+VALUES (source.MaNguoiDung, source.TenNguoiDung, source.DonViBoPhanId, 1, SYSDATETIME(), N'MIGRATION', N'Migration');
 
 ;WITH PhieuSource AS (
     SELECT p.*, tb.Id AS ThietBiId, pb.Id AS PhongBanId, bp.Id AS BoPhanId, nsd.Id AS NguoiSuDungId
@@ -408,16 +408,16 @@ WHEN MATCHED THEN UPDATE SET
     NoiDung = source.NoiDung, ChiPhi = source.ChiPhi, FileScan01 = source.FileScan01, FileScan02 = source.FileScan02, GhiChu = source.GhiChu, IsActive = 1,
     NgayKhoiTao = COALESCE(source.LogDate, target.NgayKhoiTao), MaNguoiNhap = COALESCE(NULLIF(source.LogUser, N''), target.MaNguoiNhap), TenNguoiNhap = COALESCE(NULLIF(source.LogUser, N''), target.TenNguoiNhap),
     NgayChinhSuaCuoiCung = source.LogDateLast, MaNguoiChinhSua = source.LogUserLast, TenNguoiChinhSua = source.LogUserLast
-WHEN NOT MATCHED THEN INSERT (Id, SoPhieu, LoaiPhieu, NgayPhieu, ThietBiId, PhongBanId, BoPhanId, NguoiSuDungId, NoiDung, ChiPhi, FileScan01, FileScan02, GhiChu, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap, NgayChinhSuaCuoiCung, MaNguoiChinhSua, TenNguoiChinhSua)
-VALUES (NEWID(), source.SoPhieu, source.LoaiPhieu, source.NgayPhieu, source.ThietBiId, source.PhongBanId, source.BoPhanId, source.NguoiSuDungId, source.NoiDung, source.ChiPhi, source.FileScan01, source.FileScan02, source.GhiChu, 1, COALESCE(source.LogDate, SYSDATETIME()), source.LogUser, source.LogUser, source.LogDateLast, source.LogUserLast, source.LogUserLast);
+WHEN NOT MATCHED THEN INSERT (SoPhieu, LoaiPhieu, NgayPhieu, ThietBiId, PhongBanId, BoPhanId, NguoiSuDungId, NoiDung, ChiPhi, FileScan01, FileScan02, GhiChu, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap, NgayChinhSuaCuoiCung, MaNguoiChinhSua, TenNguoiChinhSua)
+VALUES (source.SoPhieu, source.LoaiPhieu, source.NgayPhieu, source.ThietBiId, source.PhongBanId, source.BoPhanId, source.NguoiSuDungId, source.NoiDung, source.ChiPhi, source.FileScan01, source.FileScan02, source.GhiChu, 1, COALESCE(source.LogDate, SYSDATETIME()), source.LogUser, source.LogUser, source.LogDateLast, source.LogUserLast, source.LogUserLast);
 
 DELETE c
 FROM dbo.PhieuThietBiChiTiet c
 JOIN dbo.PhieuThietBi p ON p.Id = c.PhieuThietBiId
 JOIN #PhieuCu pc ON pc.SoPhieu = p.SoPhieu AND pc.LoaiPhieu = p.LoaiPhieu;
 
-INSERT INTO dbo.PhieuThietBiChiTiet (Id, PhieuThietBiId, NoiDung, GiaTri, ChiPhi, GhiChu, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-SELECT NEWID(), p.Id, COALESCE(ct.TenThongSo, ct.MaThongSo), ct.GiaTri, ct.ChiPhi, ct.GhiChu, COALESCE(ct.LogDate, pc.LogDate, SYSDATETIME()), COALESCE(ct.LogUser, pc.LogUser), COALESCE(ct.LogUser, pc.LogUser)
+INSERT INTO dbo.PhieuThietBiChiTiet (PhieuThietBiId, NoiDung, GiaTri, ChiPhi, GhiChu, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+SELECT p.Id, COALESCE(ct.TenThongSo, ct.MaThongSo), ct.GiaTri, ct.ChiPhi, ct.GhiChu, COALESCE(ct.LogDate, pc.LogDate, SYSDATETIME()), COALESCE(ct.LogUser, pc.LogUser), COALESCE(ct.LogUser, pc.LogUser)
 FROM #ChiTietCu ct
 JOIN #PhieuCu pc ON pc.LegacyKey = ct.LegacyKey
 JOIN dbo.PhieuThietBi p ON p.SoPhieu = pc.SoPhieu AND p.LoaiPhieu = pc.LoaiPhieu;
@@ -439,8 +439,8 @@ JOIN #PhieuCu pc ON pc.SoPhieu = p.SoPhieu AND pc.LoaiPhieu = p.LoaiPhieu;
     LEFT JOIN dbo.DonViBoPhan pbTruoc ON pbTruoc.MaDonVi = pc.MaPhongBanTruoc
     LEFT JOIN dbo.NguoiSuDungThietBi nsdTruoc ON nsdTruoc.MaNguoiDung = pc.MaNguoiDungTruoc
 )
-INSERT INTO dbo.LichSuThietBi (Id, ThietBiId, LoaiNghiepVu, NghiepVuId, PhongBanTruocId, PhongBanSauId, BoPhanSauId, NguoiSuDungTruocId, NguoiSuDungSauId, NoiDung, NgayPhatSinh, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-SELECT NEWID(), ThietBiId, LoaiPhieu, PhieuId, PhongBanTruocId, PhongBanSauId, BoPhanSauId, NguoiSuDungTruocId, NguoiSuDungSauId,
+INSERT INTO dbo.LichSuThietBi (ThietBiId, LoaiNghiepVu, NghiepVuId, PhongBanTruocId, PhongBanSauId, BoPhanSauId, NguoiSuDungTruocId, NguoiSuDungSauId, NoiDung, NgayPhatSinh, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+SELECT ThietBiId, LoaiPhieu, PhieuId, PhongBanTruocId, PhongBanSauId, BoPhanSauId, NguoiSuDungTruocId, NguoiSuDungSauId,
     CONCAT(LoaiPhieu, N' từ dữ liệu cũ ', SoPhieu, CASE WHEN NoiDung IS NULL THEN N'' ELSE N': ' + NoiDung END), NgayPhieu, COALESCE(LogDate, SYSDATETIME()), LogUser, LogUser
 FROM HistorySource;
 

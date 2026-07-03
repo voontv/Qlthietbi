@@ -37,7 +37,7 @@ namespace QlThietBi.Businesses.NguoiSuDungThietBi
                 .ToListAsync();
         }
 
-        public async Task<NguoiSuDungThietBiDto?> GetUserByIdAsync(Guid id)
+        public async Task<NguoiSuDungThietBiDto?> GetUserByIdAsync(int id)
         {
             var entity = await context.NguoiSuDungThietBis.FindAsync(id);
             if (entity == null)
@@ -79,7 +79,6 @@ namespace QlThietBi.Businesses.NguoiSuDungThietBi
             {
                 entity = new global::QlThietBi.Models.NguoiSuDungThietBi
                 {
-                    Id = Guid.NewGuid(),
                     MaNguoiDung = request.MaNguoiDung,
                     TenNguoiDung = request.TenNguoiDung,
                     DonViBoPhanId = request.DonViBoPhanId,
@@ -109,7 +108,7 @@ namespace QlThietBi.Businesses.NguoiSuDungThietBi
             };
         }
 
-        public async Task<bool> DeleteUserAsync(Guid id)
+        public async Task<bool> DeleteUserAsync(int id)
         {
             var entity = await context.NguoiSuDungThietBis.FindAsync(id);
             if (entity == null)
@@ -124,3 +123,5 @@ namespace QlThietBi.Businesses.NguoiSuDungThietBi
         }
     }
 }
+
+

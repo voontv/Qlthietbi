@@ -10,7 +10,7 @@ namespace QlThietBi.Models
             modelBuilder.Entity<DmDungChung>().HasData(
                 new DmDungChung
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                    Id = 1,
                     NhomDanhMuc = "TRANG_THAI_TB",
                     Ma = "MOI_NHAP",
                     Ten = "Mới nhập",
@@ -20,7 +20,7 @@ namespace QlThietBi.Models
                 },
                 new DmDungChung
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0000-000000000002"),
+                    Id = 2,
                     NhomDanhMuc = "TRANG_THAI_TB",
                     Ma = "TRONG_KHO",
                     Ten = "Trong kho",
@@ -30,7 +30,7 @@ namespace QlThietBi.Models
                 },
                 new DmDungChung
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0000-000000000003"),
+                    Id = 3,
                     NhomDanhMuc = "TRANG_THAI_TB",
                     Ma = "DANG_SU_DUNG",
                     Ten = "Đang sử dụng",
@@ -40,7 +40,7 @@ namespace QlThietBi.Models
                 },
                 new DmDungChung
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0000-000000000004"),
+                    Id = 4,
                     NhomDanhMuc = "TRANG_THAI_TB",
                     Ma = "DANG_SUA_CHUA",
                     Ten = "Đang sửa chữa",
@@ -50,7 +50,7 @@ namespace QlThietBi.Models
                 },
                 new DmDungChung
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0000-000000000005"),
+                    Id = 5,
                     NhomDanhMuc = "TRANG_THAI_TB",
                     Ma = "DANG_BAO_TRI",
                     Ten = "Đang bảo trì/bảo dưỡng",
@@ -60,7 +60,7 @@ namespace QlThietBi.Models
                 },
                 new DmDungChung
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0000-000000000006"),
+                    Id = 6,
                     NhomDanhMuc = "TRANG_THAI_TB",
                     Ma = "CHO_THANH_LY",
                     Ten = "Chờ thanh lý",
@@ -70,7 +70,7 @@ namespace QlThietBi.Models
                 },
                 new DmDungChung
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0000-000000000007"),
+                    Id = 7,
                     NhomDanhMuc = "TRANG_THAI_TB",
                     Ma = "DA_THANH_LY",
                     Ten = "Đã thanh lý",
@@ -80,7 +80,7 @@ namespace QlThietBi.Models
                 },
                 new DmDungChung
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0000-000000000008"),
+                    Id = 8,
                     NhomDanhMuc = "TRANG_THAI_TB",
                     Ma = "MAT_HUY",
                     Ten = "Mất/Hủy",

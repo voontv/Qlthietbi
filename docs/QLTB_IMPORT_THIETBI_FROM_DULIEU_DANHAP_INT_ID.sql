@@ -6617,14 +6617,14 @@ VALUES
 
 IF NOT EXISTS (SELECT 1 FROM dbo.NhomThietBi WHERE MaNhomThietBi = N'KHONG_XAC_DINH')
 BEGIN
-    INSERT INTO dbo.NhomThietBi (Id, MaNhomThietBi, TenNhomThietBi, KyHieu, ParentId, MoTa, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-    VALUES (NEWID(), N'KHONG_XAC_DINH', N'Không xác định', NULL, NULL, N'Fallback group for imported equipment without old MA_NHOM_THIET_BI.', 999999, 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
+    INSERT INTO dbo.NhomThietBi (MaNhomThietBi, TenNhomThietBi, KyHieu, ParentId, MoTa, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+    VALUES (N'KHONG_XAC_DINH', N'Không xác định', NULL, NULL, N'Fallback group for imported equipment without old MA_NHOM_THIET_BI.', 999999, 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
 END;
 
 IF NOT EXISTS (SELECT 1 FROM dbo.DmDungChung WHERE NhomDanhMuc = N'TRANG_THAI_TB' AND Ma = N'KHONG_XAC_DINH')
 BEGIN
-    INSERT INTO dbo.DmDungChung (Id, NhomDanhMuc, Ma, Ten, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-    VALUES (NEWID(), N'TRANG_THAI_TB', N'KHONG_XAC_DINH', N'Không xác định', 999999, 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
+    INSERT INTO dbo.DmDungChung (NhomDanhMuc, Ma, Ten, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+    VALUES (N'TRANG_THAI_TB', N'KHONG_XAC_DINH', N'Không xác định', 999999, 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
 END;
 
 ;WITH NhomDoiTuong AS (
@@ -6638,8 +6638,8 @@ USING NhomDoiTuong AS source
 ON target.MaNhomThietBi = source.MaNhomThietBi
 WHEN MATCHED THEN UPDATE SET TenNhomThietBi = source.TenNhomThietBi, ParentId = NULL, IsActive = 1
 WHEN NOT MATCHED THEN
-    INSERT (Id, MaNhomThietBi, TenNhomThietBi, KyHieu, ParentId, MoTa, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-    VALUES (NEWID(), source.MaNhomThietBi, source.TenNhomThietBi, NULL, NULL, N'Parent group converted from old MA_NHOM_DOI_TUONG in equipment data.', source.SapXep, 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
+    INSERT (MaNhomThietBi, TenNhomThietBi, KyHieu, ParentId, MoTa, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+    VALUES (source.MaNhomThietBi, source.TenNhomThietBi, NULL, NULL, N'Parent group converted from old MA_NHOM_DOI_TUONG in equipment data.', source.SapXep, 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
 
 ;WITH NhomCon AS (
     SELECT MaNhomThietBi, MAX(TenNhomThietBi) AS TenNhomThietBi, MAX(KyHieuNhomThietBi) AS KyHieuNhomThietBi, MAX(MaNhomDoiTuong) AS MaNhomDoiTuong
@@ -6670,8 +6670,8 @@ WHEN MATCHED THEN UPDATE SET
     MaNguoiChinhSua = @MaNguoiNhap,
     TenNguoiChinhSua = @TenNguoiNhap
 WHEN NOT MATCHED THEN
-    INSERT (Id, MaNhomThietBi, TenNhomThietBi, KyHieu, ParentId, MoTa, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-    VALUES (NEWID(), source.MaNhomThietBi, source.TenNhomThietBi, source.KyHieuNhomThietBi, source.ParentId, N'Created from real equipment import because the group code was missing from catalog seed.', TRY_CONVERT(INT, source.MaNhomThietBi), 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
+    INSERT (MaNhomThietBi, TenNhomThietBi, KyHieu, ParentId, MoTa, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+    VALUES (source.MaNhomThietBi, source.TenNhomThietBi, source.KyHieuNhomThietBi, source.ParentId, N'Created from real equipment import because the group code was missing from catalog seed.', TRY_CONVERT(INT, source.MaNhomThietBi), 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
 
 ;WITH Catalogs AS (
     SELECT N'TRANG_THAI_TB' AS NhomDanhMuc, MaTrangThai AS Ma, TenTrangThai AS Ten FROM #ThietBiCu WHERE MaTrangThai IS NOT NULL
@@ -6697,8 +6697,8 @@ USING CatalogSource AS source
 ON target.NhomDanhMuc = source.NhomDanhMuc AND target.Ma = source.Ma
 WHEN MATCHED THEN UPDATE SET Ten = source.Ten, IsActive = 1, NgayChinhSuaCuoiCung = SYSDATETIME(), MaNguoiChinhSua = @MaNguoiNhap, TenNguoiChinhSua = @TenNguoiNhap
 WHEN NOT MATCHED THEN
-    INSERT (Id, NhomDanhMuc, Ma, Ten, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-    VALUES (NEWID(), source.NhomDanhMuc, source.Ma, source.Ten, TRY_CONVERT(INT, source.Ma), 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
+    INSERT (NhomDanhMuc, Ma, Ten, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+    VALUES (source.NhomDanhMuc, source.Ma, source.Ten, TRY_CONVERT(INT, source.Ma), 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
 
 ;WITH Units AS (
     SELECT MaPhongBan AS MaDonVi, TenPhongBan AS TenDonVi, N'PHONG_BAN_CU' AS LoaiDonVi FROM #ThietBiCu WHERE MaPhongBan IS NOT NULL
@@ -6713,8 +6713,8 @@ USING UnitSource AS source
 ON target.MaDonVi = source.MaDonVi
 WHEN MATCHED THEN UPDATE SET TenDonVi = CASE WHEN target.LoaiDonVi = N'DON_VI_CHA_CU' THEN source.TenDonVi ELSE target.TenDonVi END, IsActive = 1
 WHEN NOT MATCHED THEN
-    INSERT (Id, MaDonVi, TenDonVi, ParentId, LoaiDonVi, GhiChu, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-    VALUES (NEWID(), source.MaDonVi, source.TenDonVi, NULL, source.LoaiDonVi, N'Created from real equipment import.', TRY_CONVERT(INT, source.MaDonVi), 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
+    INSERT (MaDonVi, TenDonVi, ParentId, LoaiDonVi, GhiChu, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+    VALUES (source.MaDonVi, source.TenDonVi, NULL, source.LoaiDonVi, N'Created from real equipment import.', TRY_CONVERT(INT, source.MaDonVi), 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
 
 ;WITH Users AS (
     SELECT MaNguoiDung, MAX(TenNguoiDung) AS TenNguoiDung, MAX(MaPhongBan) AS MaPhongBan, MAX(MaBoPhan) AS MaBoPhan
@@ -6734,8 +6734,8 @@ USING UserSource AS source
 ON target.MaNguoiDung = source.MaNguoiDung
 WHEN MATCHED THEN UPDATE SET TenNguoiDung = source.TenNguoiDung, DonViBoPhanId = COALESCE(target.DonViBoPhanId, source.DonViBoPhanId), IsActive = 1, NgayChinhSuaCuoiCung = SYSDATETIME(), MaNguoiChinhSua = @MaNguoiNhap, TenNguoiChinhSua = @TenNguoiNhap
 WHEN NOT MATCHED THEN
-    INSERT (Id, MaNguoiDung, TenNguoiDung, DonViBoPhanId, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-    VALUES (NEWID(), source.MaNguoiDung, source.TenNguoiDung, source.DonViBoPhanId, 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
+    INSERT (MaNguoiDung, TenNguoiDung, DonViBoPhanId, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+    VALUES (source.MaNguoiDung, source.TenNguoiDung, source.DonViBoPhanId, 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
 
 ;WITH ThietBiSource AS (
     SELECT s.*,
@@ -6798,8 +6798,8 @@ WHEN MATCHED THEN UPDATE SET
     MaNguoiChinhSua = @MaNguoiNhap,
     TenNguoiChinhSua = @TenNguoiNhap
 WHEN NOT MATCHED THEN
-    INSERT (Id, MaThietBi, MaThietBiCu, TenThietBi, Model, MaKeToan, MaThietBiCha, NhomThietBiId, TrangThaiId, TrangThaiKiemKeId, DonViTinhId, NhanHieuId, MauSacId, NuocSanXuatId, ChatLieuId, DonViCungCapId, PhongBanId, BoPhanId, NguoiSuDungId, NgayNhapThietBi, NgayDuaVaoSuDung, NguyenGia, ThoiGianBaoHanh, NgayHetBaoHanh, MaQrCode, GhiChu, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-    VALUES (NEWID(), source.MaThietBi, source.MaThietBiCu, COALESCE(NULLIF(source.TenThietBi, N''), source.MaThietBi), source.MaHieuThietBi, COALESCE(source.MaKeToan, source.MaHieuThietBi), source.MaThietBiCha, source.NhomThietBiId, source.TrangThaiId, source.TrangThaiKiemKeId, source.DonViTinhId, source.NhanHieuId, source.MauSacId, source.NuocSanXuatId, source.ChatLieuId, source.DonViCungCapId, source.PhongBanId, source.BoPhanId, source.NguoiSuDungId, source.NgayNhapThietBi, source.NgayDuaVaoSuDung, source.NguyenGia, source.ThoiGianBaoHanh, CASE WHEN source.ThoiGianBaoHanh IS NOT NULL AND source.ThoiGianBaoHanh > 0 THEN DATEADD(MONTH, source.ThoiGianBaoHanh, COALESCE(source.NgayDuaVaoSuDung, source.NgayNhapThietBi)) ELSE NULL END, source.MaThietBi, LEFT(source.GhiChu, 1000), 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
+    INSERT (MaThietBi, MaThietBiCu, TenThietBi, Model, MaKeToan, MaThietBiCha, NhomThietBiId, TrangThaiId, TrangThaiKiemKeId, DonViTinhId, NhanHieuId, MauSacId, NuocSanXuatId, ChatLieuId, DonViCungCapId, PhongBanId, BoPhanId, NguoiSuDungId, NgayNhapThietBi, NgayDuaVaoSuDung, NguyenGia, ThoiGianBaoHanh, NgayHetBaoHanh, MaQrCode, GhiChu, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+    VALUES (source.MaThietBi, source.MaThietBiCu, COALESCE(NULLIF(source.TenThietBi, N''), source.MaThietBi), source.MaHieuThietBi, COALESCE(source.MaKeToan, source.MaHieuThietBi), source.MaThietBiCha, source.NhomThietBiId, source.TrangThaiId, source.TrangThaiKiemKeId, source.DonViTinhId, source.NhanHieuId, source.MauSacId, source.NuocSanXuatId, source.ChatLieuId, source.DonViCungCapId, source.PhongBanId, source.BoPhanId, source.NguoiSuDungId, source.NgayNhapThietBi, source.NgayDuaVaoSuDung, source.NguyenGia, source.ThoiGianBaoHanh, CASE WHEN source.ThoiGianBaoHanh IS NOT NULL AND source.ThoiGianBaoHanh > 0 THEN DATEADD(MONTH, source.ThoiGianBaoHanh, COALESCE(source.NgayDuaVaoSuDung, source.NgayNhapThietBi)) ELSE NULL END, source.MaThietBi, LEFT(source.GhiChu, 1000), 1, SYSDATETIME(), @MaNguoiNhap, @TenNguoiNhap);
 
 DROP TABLE #ThietBiCu;
 GO

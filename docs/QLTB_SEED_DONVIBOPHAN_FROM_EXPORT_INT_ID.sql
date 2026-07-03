@@ -156,13 +156,11 @@ WHEN MATCHED THEN
         MaNguoiChinhSua = N'0044',
         TenNguoiChinhSua = N'Trương Văn Voôn'
 WHEN NOT MATCHED THEN
-    INSERT (Id, MaDonVi, TenDonVi, ParentId, LoaiDonVi, GhiChu, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-    VALUES (NEWID(), source.MaDonVi, source.TenDonVi, NULL, CASE WHEN source.TenDonVi LIKE N'%Kho%' THEN N'KHO' ELSE N'BO_PHAN' END, source.GhiChu, source.SapXep, 1, SYSDATETIME(), N'0044', N'Trương Văn Voôn');
+    INSERT (MaDonVi, TenDonVi, ParentId, LoaiDonVi, GhiChu, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+    VALUES (source.MaDonVi, source.TenDonVi, NULL, CASE WHEN source.TenDonVi LIKE N'%Kho%' THEN N'KHO' ELSE N'BO_PHAN' END, source.GhiChu, source.SapXep, 1, SYSDATETIME(), N'0044', N'Trương Văn Voôn');
 
-INSERT INTO dbo.DonViBoPhan (Id, MaDonVi, TenDonVi, ParentId, LoaiDonVi, GhiChu, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-SELECT
-    NEWID(),
-    missing.MaDonViParent,
+INSERT INTO dbo.DonViBoPhan (MaDonVi, TenDonVi, ParentId, LoaiDonVi, GhiChu, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+SELECT missing.MaDonViParent,
     N'Don vi cha cu ' + missing.MaDonViParent,
     NULL,
     N'DON_VI_CHA_CU',

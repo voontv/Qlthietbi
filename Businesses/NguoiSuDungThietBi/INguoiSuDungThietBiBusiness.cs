@@ -1,4 +1,4 @@
-using QlThietBi.AutoConfig;
+﻿using QlThietBi.AutoConfig;
 using QlThietBi.DTO.Request;
 using QlThietBi.DTO.Response;
 using System;
@@ -11,8 +11,10 @@ namespace QlThietBi.Businesses.NguoiSuDungThietBi
     public interface INguoiSuDungThietBiBusiness
     {
         Task<IEnumerable<NguoiSuDungThietBiDto>> GetUsersAsync();
-        Task<NguoiSuDungThietBiDto?> GetUserByIdAsync(Guid id);
+        Task<NguoiSuDungThietBiDto?> GetUserByIdAsync(int id);
         Task<NguoiSuDungThietBiDto> SaveUserAsync(CreateUpdateNguoiSuDungThietBiRequest request);
-        Task<bool> DeleteUserAsync(Guid id);
+        Task<bool> DeleteUserAsync(int id);
     }
 }
+
+

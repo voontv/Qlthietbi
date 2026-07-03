@@ -1,12 +1,12 @@
-using System;
+﻿using System;
 
 namespace QlThietBi.DTO.Request
 {
     public class CreateUpdateTepDinhKemRequest
     {
-        public Guid? Id { get; set; }
+        public int? Id { get; set; }
         public string DoiTuongLoai { get; set; } = null!;
-        public Guid DoiTuongId { get; set; }
+        public int DoiTuongId { get; set; }
         public string TenFile { get; set; } = null!;
         public string DuongDan { get; set; } = null!;
         public string? LoaiFile { get; set; }
@@ -14,3 +14,5 @@ namespace QlThietBi.DTO.Request
         public string? GhiChu { get; set; }
     }
 }
+
+

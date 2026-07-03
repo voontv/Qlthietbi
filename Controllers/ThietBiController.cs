@@ -38,7 +38,7 @@ namespace QlThietBi.Controllers
         /// <remarks>
         /// Request mẫu:
         /// {
-        ///   "id": "guid?",
+        ///   "id": "int?",
         ///   "nhomDanhMuc": "TRANG_THAI_TB",
         ///   "ma": "DANG_SU_DUNG",
         ///   "ten": "Đang sử dụng",
@@ -62,7 +62,7 @@ namespace QlThietBi.Controllers
         /// <response code="204">Xóa thành công.</response>
         /// <response code="404">Không tìm thấy danh mục.</response>
         [HttpDelete("danh-muc/{id}")]
-        public async Task<ActionResult> XoaDanhMucDungChung(Guid id)
+        public async Task<ActionResult> XoaDanhMucDungChung(int id)
         {
             var removed = await thietBiBusiness.XoaDanhMucDungChungAsync(id);
             if (!removed)
@@ -89,7 +89,7 @@ namespace QlThietBi.Controllers
         /// <remarks>
         /// Request mẫu:
         /// {
-        ///   "id": "guid?",
+        ///   "id": "int?",
         ///   "maNhom": "NHOM_01",
         ///   "tenNhom": "Máy in",
         ///   "ghiChu": "",
@@ -112,7 +112,7 @@ namespace QlThietBi.Controllers
         /// <response code="204">Xóa thành công.</response>
         /// <response code="404">Không tìm thấy nhóm thiết bị.</response>
         [HttpDelete("nhom-thiet-bi/{id}")]
-        public async Task<ActionResult> XoaNhomThietBi(Guid id)
+        public async Task<ActionResult> XoaNhomThietBi(int id)
         {
             var removed = await thietBiBusiness.XoaNhomThietBiAsync(id);
             if (!removed)
@@ -134,13 +134,29 @@ namespace QlThietBi.Controllers
         }
 
         /// <summary>
+        /// Thống kê và tìm kiếm thiết bị theo phòng ban, bộ phận, nhóm thiết bị.
+        /// </summary>
+        /// <remarks>
+        /// Không truyền tham số nào thì xem như lấy tất cả.
+        /// Nếu truyền nhóm thiết bị cha thì thống kê cả các nhóm con trực thuộc.
+        /// </remarks>
+        /// <param name="request">Bộ lọc thống kê.</param>
+        /// <response code="200">Tổng hợp và danh sách thiết bị sau lọc.</response>
+        [HttpGet("thiet-bi/thong-ke")]
+        public async Task<ActionResult<ThongKeThietBiDto>> ThongKeThietBi([FromQuery] QueryThongKeThietBiRequest request)
+        {
+            var result = await thietBiBusiness.ThongKeThietBiAsync(request);
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Lấy thiết bị theo Id.
         /// </summary>
         /// <param name="id">Id thiết bị.</param>
         /// <response code="200">Trả về thông tin thiết bị.</response>
         /// <response code="404">Không tìm thấy thiết bị.</response>
         [HttpGet("thiet-bi/{id}")]
-        public async Task<ActionResult<ThietBiDto>> LayThietBiTheoId(Guid id)
+        public async Task<ActionResult<ThietBiDto>> LayThietBiTheoId(int id)
         {
             var result = await thietBiBusiness.LayThietBiTheoIdAsync(id);
             if (result == null)
@@ -171,7 +187,7 @@ namespace QlThietBi.Controllers
         /// <response code="204">Xóa thành công.</response>
         /// <response code="404">Không tìm thấy thiết bị.</response>
         [HttpDelete("thiet-bi/{id}")]
-        public async Task<ActionResult> XoaThietBi(Guid id)
+        public async Task<ActionResult> XoaThietBi(int id)
         {
             var removed = await thietBiBusiness.XoaThietBiAsync(id);
             if (!removed)
@@ -187,7 +203,7 @@ namespace QlThietBi.Controllers
         /// <param name="nhomThietBiId">Id nhóm thiết bị.</param>
         /// <response code="200">Trả về danh sách thông số thiết bị.</response>
         [HttpGet("thiet-bi/{nhomThietBiId}/thong-so")]
-        public async Task<ActionResult<IEnumerable<DmThongSoThietBiDto>>> LayThongSoTheoNhomThietBi(Guid nhomThietBiId)
+        public async Task<ActionResult<IEnumerable<DmThongSoThietBiDto>>> LayThongSoTheoNhomThietBi(int nhomThietBiId)
         {
             var result = await thietBiBusiness.LayThongSoTheoNhomThietBiAsync(nhomThietBiId);
             return Ok(result);
@@ -199,8 +215,8 @@ namespace QlThietBi.Controllers
         /// <remarks>
         /// Request mẫu:
         /// {
-        ///   "id": "guid?",
-        ///   "nhomThietBiId": "guid",
+        ///   "id": "int?",
+        ///   "nhomThietBiId": "int",
         ///   "maThongSo": "RAM",
         ///   "tenThongSo": "Bộ nhớ RAM",
         ///   "donVi": "GB",
@@ -224,7 +240,7 @@ namespace QlThietBi.Controllers
         /// <response code="204">Xóa thành công.</response>
         /// <response code="404">Không tìm thấy thông số.</response>
         [HttpDelete("thiet-bi/thong-so/{id}")]
-        public async Task<ActionResult> XoaThongSoThietBi(Guid id)
+        public async Task<ActionResult> XoaThongSoThietBi(int id)
         {
             var removed = await thietBiBusiness.XoaThongSoThietBiAsync(id);
             if (!removed)
@@ -240,15 +256,15 @@ namespace QlThietBi.Controllers
         /// <remarks>
         /// Request mẫu:
         /// {
-        ///   "thietBiId": "guid",
+        ///   "thietBiId": "int",
         ///   "loaiPhieu": "CAP_PHAT",
         ///   "noiDung": "Cấp phát cho phòng Kỹ thuật",
-        ///   "phongBanId": "guid?",
-        ///   "boPhanId": "guid?",
-        ///   "nguoiSuDungId": "guid?",
+        ///   "phongBanId": "int?",
+        ///   "boPhanId": "int?",
+        ///   "nguoiSuDungId": "int?",
         ///   "chiTiet": [
         ///     {
-        ///       "thongSoId": "guid",
+        ///       "thongSoId": "int",
         ///       "giaTriTruoc": "4GB",
         ///       "giaTriSau": "8GB"
         ///     }
@@ -269,10 +285,12 @@ namespace QlThietBi.Controllers
         /// <param name="thietBiId">Id thiết bị.</param>
         /// <response code="200">Danh sách lịch sử thiết bị.</response>
         [HttpGet("thiet-bi/{thietBiId}/lich-su")]
-        public async Task<ActionResult<IEnumerable<LichSuThietBiDto>>> LayLichSuThietBi(Guid thietBiId)
+        public async Task<ActionResult<IEnumerable<LichSuThietBiDto>>> LayLichSuThietBi(int thietBiId)
         {
             var result = await thietBiBusiness.LayLichSuThietBiAsync(thietBiId);
             return Ok(result);
         }
     }
 }
+
+

@@ -1,25 +1,25 @@
-# Thiết kế lại phần mềm Quản lý thiết bị
+# Thi?t k? l?i ph?n m?m Qu?n l� thi?t b?
 
-## 1. Mục tiêu
+## 1. M?c ti�u
 
-Thiết kế mới phần mềm quản lý thiết bị trên SQL Server theo hướng chuẩn hóa, dễ mở rộng, không phụ thuộc thiết kế Oracle cũ.  
-Oracle cũ chỉ dùng làm nguồn dữ liệu để tham khảo và convert sau.
+Thi?t k? m?i ph?n m?m qu?n l� thi?t b? tr�n SQL Server theo hu?ng chu?n h�a, d? m? r?ng, kh�ng ph? thu?c thi?t k? Oracle cu.  
+Oracle cu ch? d�ng l�m ngu?n d? li?u d? tham kh?o v� convert sau.
 
-Hệ thống mới cần đáp ứng:
+H? th?ng m?i c?n d�p ?ng:
 
-- Quản lý hồ sơ thiết bị.
-- Quản lý danh mục.
-- Quản lý thông số động theo từng nhóm thiết bị.
-- Quản lý nhập mới, cấp phát, thu hồi, điều chuyển, sửa chữa, bảo trì, kiểm kê, thanh lý.
-- Lưu lịch sử vòng đời thiết bị.
-- Có thể mở rộng QR Code, file đính kèm, dashboard, báo cáo.
-- Phù hợp kiến trúc .NET API: Controller + Business + DTO.
+- Qu?n l� h? so thi?t b?.
+- Qu?n l� danh m?c.
+- Qu?n l� th�ng s? d?ng theo t?ng nh�m thi?t b?.
+- Qu?n l� nh?p m?i, c?p ph�t, thu h?i, di?u chuy?n, s?a ch?a, b?o tr�, ki?m k�, thanh l�.
+- Luu l?ch s? v�ng d?i thi?t b?.
+- C� th? m? r?ng QR Code, file d�nh k�m, dashboard, b�o c�o.
+- Ph� h?p ki?n tr�c .NET API: Controller + Business + DTO.
 
 ---
 
-## 2. Nguyên tắc thiết kế
+## 2. Nguy�n t?c thi?t k?
 
-### 2.1. Không lưu dư tên danh mục trong bảng nghiệp vụ
+### 2.1. Kh�ng luu du t�n danh m?c trong b?ng nghi?p v?
 
 Sai:
 
@@ -30,65 +30,65 @@ MaPhongBan
 TenPhongBan
 ```
 
-Đúng:
+��ng:
 
 ```text
 TrangThaiId
 PhongBanId
 ```
 
-Tên hiển thị lấy qua JOIN từ bảng danh mục.
+T�n hi?n th? l?y qua JOIN t? b?ng danh m?c.
 
-### 2.2. Thiết bị có thông tin chung và thông tin riêng
+### 2.2. Thi?t b? c� th�ng tin chung v� th�ng tin ri�ng
 
-Thông tin chung lưu ở bảng `ThietBi`.
+Th�ng tin chung luu ? b?ng `ThietBi`.
 
-Ví dụ:
+V� d?:
 
-- Mã thiết bị.
-- Tên thiết bị.
-- Nhóm thiết bị.
-- Trạng thái.
-- Đơn vị sử dụng.
-- Người sử dụng.
-- Ngày mua.
-- Nguyên giá.
-- Ghi chú.
+- M� thi?t b?.
+- T�n thi?t b?.
+- Nh�m thi?t b?.
+- Tr?ng th�i.
+- �on v? s? d?ng.
+- Ngu?i s? d?ng.
+- Ng�y mua.
+- Nguy�n gi�.
+- Ghi ch�.
 
-Thông tin riêng theo từng nhóm thiết bị lưu bằng cơ chế **thông số động**.
+Th�ng tin ri�ng theo t?ng nh�m thi?t b? luu b?ng co ch? **th�ng s? d?ng**.
 
-Ví dụ:
+V� d?:
 
-- Máy tính: CPU, RAM, SSD, IP, MAC, License.
-- Máy in: Khổ giấy, tốc độ in, loại mực.
-- Máy bơm: Công suất, lưu lượng, cột áp.
-- Camera: IP, độ phân giải, vị trí lắp đặt.
-- Đồng hồ nước: Cỡ đồng hồ, số thân, cấp chính xác.
+- M�y t�nh: CPU, RAM, SSD, IP, MAC, License.
+- M�y in: Kh? gi?y, t?c d? in, lo?i m?c.
+- M�y bom: C�ng su?t, luu lu?ng, c?t �p.
+- Camera: IP, d? ph�n gi?i, v? tr� l?p d?t.
+- �?ng h? nu?c: C? d?ng h?, s? th�n, c?p ch�nh x�c.
 
-### 2.3. Mọi biến động phải ghi lịch sử
+### 2.3. M?i bi?n d?ng ph?i ghi l?ch s?
 
-Khi thiết bị thay đổi trạng thái, phòng ban, người sử dụng, sửa chữa, bảo trì, điều chuyển hoặc thanh lý thì phải ghi vào bảng `LichSuThietBi`.
+Khi thi?t b? thay d?i tr?ng th�i, ph�ng ban, ngu?i s? d?ng, s?a ch?a, b?o tr�, di?u chuy?n ho?c thanh l� th� ph?i ghi v�o b?ng `LichSuThietBi`.
 
 ---
 
-## 3. Danh mục chính
+## 3. Danh m?c ch�nh
 
 ### 3.1. DmDungChung
 
-Dùng lưu các danh mục nhỏ:
+D�ng luu c�c danh m?c nh?:
 
-- Trạng thái thiết bị.
-- Đơn vị tính.
-- Nhóm quản lý.
-- Nhóm đối tượng.
-- Màu sắc.
-- Nhãn hiệu.
-- Nước sản xuất.
-- Chất liệu.
-- Loại thanh lý.
-- Lý do thanh lý.
-- Kết luận.
-- Công việc bảo trì/bảo dưỡng.
+- Tr?ng th�i thi?t b?.
+- �on v? t�nh.
+- Nh�m qu?n l�.
+- Nh�m d?i tu?ng.
+- M�u s?c.
+- Nh�n hi?u.
+- Nu?c s?n xu?t.
+- Ch?t li?u.
+- Lo?i thanh l�.
+- L� do thanh l�.
+- K?t lu?n.
+- C�ng vi?c b?o tr�/b?o du?ng.
 
 ```sql
 CREATE TABLE dbo.DmDungChung (
@@ -114,7 +114,7 @@ ON dbo.DmDungChung(NhomDanhMuc, Ma);
 
 ---
 
-## 4. Đơn vị, phòng ban, bộ phận
+## 4. �on v?, ph�ng ban, b? ph?n
 
 ```sql
 CREATE TABLE dbo.DonViBoPhan (
@@ -138,7 +138,7 @@ CREATE TABLE dbo.DonViBoPhan (
 
 ---
 
-## 5. Người sử dụng thiết bị
+## 5. Ngu?i s? d?ng thi?t b?
 
 ```sql
 CREATE TABLE dbo.NguoiSuDungThietBi (
@@ -163,9 +163,9 @@ CREATE TABLE dbo.NguoiSuDungThietBi (
 
 ---
 
-## 6. Nhóm thiết bị
+## 6. Nh�m thi?t b?
 
-Nhóm thiết bị là thành phần quan trọng vì mỗi nhóm sẽ có bộ thông số riêng.
+Nh�m thi?t b? l� th�nh ph?n quan tr?ng v� m?i nh�m s? c� b? th�ng s? ri�ng.
 
 ```sql
 CREATE TABLE dbo.NhomThietBi (
@@ -190,20 +190,20 @@ CREATE UNIQUE INDEX IX_NhomThietBi_Ma
 ON dbo.NhomThietBi(MaNhomThietBi);
 ```
 
-Ví dụ nhóm:
+V� d? nh�m:
 
 ```text
-MAY_TINH       - Máy tính
-MAY_IN         - Máy in
-MAY_BOM        - Máy bơm
+MAY_TINH       - M�y t�nh
+MAY_IN         - M�y in
+MAY_BOM        - M�y bom
 CAMERA         - Camera
-DONG_HO_NUOC   - Đồng hồ nước
-THIET_BI_MANG  - Thiết bị mạng
+DONG_HO_NUOC   - �?ng h? nu?c
+THIET_BI_MANG  - Thi?t b? m?ng
 ```
 
 ---
 
-## 7. Hồ sơ thiết bị
+## 7. H? so thi?t b?
 
 ```sql
 CREATE TABLE dbo.ThietBi (
@@ -260,9 +260,9 @@ ON dbo.ThietBi(MaThietBi);
 
 ---
 
-## 8. Thông số động theo nhóm thiết bị
+## 8. Th�ng s? d?ng theo nh�m thi?t b?
 
-### 8.1. Danh mục thông số thiết bị
+### 8.1. Danh m?c th�ng s? thi?t b?
 
 ```sql
 CREATE TABLE dbo.DmThongSoThietBi (
@@ -292,7 +292,7 @@ CREATE UNIQUE INDEX IX_DmThongSoThietBi_Nhom_Ma
 ON dbo.DmThongSoThietBi(NhomThietBiId, MaThongSo);
 ```
 
-### 8.2. Giá trị thông số của từng thiết bị
+### 8.2. Gi� tr? th�ng s? c?a t?ng thi?t b?
 
 ```sql
 CREATE TABLE dbo.ThietBiThongSo (
@@ -318,88 +318,88 @@ ON dbo.ThietBiThongSo(ThietBiId, ThongSoId);
 
 ---
 
-## 9. Ví dụ thông số theo nhóm thiết bị
+## 9. V� d? th�ng s? theo nh�m thi?t b?
 
-### 9.1. Nhóm máy tính
+### 9.1. Nh�m m�y t�nh
 
-Quản lý các thông tin:
+Qu?n l� c�c th�ng tin:
 
 - CPU.
 - RAM.
-- Ổ cứng SSD.
-- Ổ cứng HDD.
-- Hệ điều hành.
+- ? c?ng SSD.
+- ? c?ng HDD.
+- H? di?u h�nh.
 - License Windows.
 - License Office.
-- Tên máy tính.
-- Địa chỉ IP.
+- T�n m�y t�nh.
+- �?a ch? IP.
 - MAC Address.
 - Domain/Workgroup.
-- Card đồ họa.
-- Kích thước màn hình.
+- Card d? h?a.
+- K�ch thu?c m�n h�nh.
 
 ```sql
--- Giả sử @NhomMayTinhId là Id nhóm Máy tính
+-- Gi? s? @NhomMayTinhId l� Id nh�m M�y t�nh
 INSERT INTO dbo.DmThongSoThietBi
 (NhomThietBiId, MaThongSo, TenThongSo, KieuDuLieu, BatBuoc, SapXep)
 VALUES
-(@NhomMayTinhId, N'CPU', N'Bộ vi xử lý', N'TEXT', 1, 1),
-(@NhomMayTinhId, N'RAM', N'Dung lượng RAM', N'NUMBER', 1, 2),
-(@NhomMayTinhId, N'SSD', N'Dung lượng ổ cứng SSD', N'NUMBER', 0, 3),
-(@NhomMayTinhId, N'HDD', N'Dung lượng ổ cứng HDD', N'NUMBER', 0, 4),
-(@NhomMayTinhId, N'OS', N'Hệ điều hành', N'TEXT', 0, 5),
+(@NhomMayTinhId, N'CPU', N'B? vi x? l�', N'TEXT', 1, 1),
+(@NhomMayTinhId, N'RAM', N'Dung lu?ng RAM', N'NUMBER', 1, 2),
+(@NhomMayTinhId, N'SSD', N'Dung lu?ng ? c?ng SSD', N'NUMBER', 0, 3),
+(@NhomMayTinhId, N'HDD', N'Dung lu?ng ? c?ng HDD', N'NUMBER', 0, 4),
+(@NhomMayTinhId, N'OS', N'H? di?u h�nh', N'TEXT', 0, 5),
 (@NhomMayTinhId, N'WINDOWS_LICENSE', N'License Windows', N'TEXT', 0, 6),
 (@NhomMayTinhId, N'OFFICE_LICENSE', N'License Office', N'TEXT', 0, 7),
-(@NhomMayTinhId, N'COMPUTER_NAME', N'Tên máy tính', N'TEXT', 0, 8),
-(@NhomMayTinhId, N'IP', N'Địa chỉ IP', N'TEXT', 0, 9),
+(@NhomMayTinhId, N'COMPUTER_NAME', N'T�n m�y t�nh', N'TEXT', 0, 8),
+(@NhomMayTinhId, N'IP', N'�?a ch? IP', N'TEXT', 0, 9),
 (@NhomMayTinhId, N'MAC', N'MAC Address', N'TEXT', 0, 10);
 ```
 
-### 9.2. Nhóm máy in
+### 9.2. Nh�m m�y in
 
-- Công nghệ in.
-- Khổ giấy.
-- Tốc độ in.
-- In màu/đen trắng.
+- C�ng ngh? in.
+- Kh? gi?y.
+- T?c d? in.
+- In m�u/den tr?ng.
 - Duplex.
-- Loại hộp mực.
-- IP máy in.
+- Lo?i h?p m?c.
+- IP m�y in.
 
-### 9.3. Nhóm máy bơm
+### 9.3. Nh�m m�y bom
 
-- Công suất.
-- Điện áp.
-- Lưu lượng.
-- Cột áp.
-- Đường kính ống.
-- Vị trí lắp đặt.
-- Ngày vận hành.
+- C�ng su?t.
+- �i?n �p.
+- Luu lu?ng.
+- C?t �p.
+- �u?ng k�nh ?ng.
+- V? tr� l?p d?t.
+- Ng�y v?n h�nh.
 
-### 9.4. Nhóm camera
+### 9.4. Nh�m camera
 
-- Độ phân giải.
+- �? ph�n gi?i.
 - IP.
 - MAC.
-- Vị trí lắp đặt.
-- Chuẩn nén.
-- Hãng đầu ghi.
-- Kênh đầu ghi.
+- V? tr� l?p d?t.
+- Chu?n n�n.
+- H�ng d?u ghi.
+- K�nh d?u ghi.
 
-### 9.5. Nhóm đồng hồ nước
+### 9.5. Nh�m d?ng h? nu?c
 
-- Cỡ đồng hồ.
-- Số thân.
-- Cấp chính xác.
-- Lưu lượng danh định.
-- Năm sản xuất.
-- Tem kiểm định.
-- Ngày kiểm định.
+- C? d?ng h?.
+- S? th�n.
+- C?p ch�nh x�c.
+- Luu lu?ng danh d?nh.
+- Nam s?n xu?t.
+- Tem ki?m d?nh.
+- Ng�y ki?m d?nh.
 
 ---
 
-## 10. Phiếu nghiệp vụ thiết bị
+## 10. Phi?u nghi?p v? thi?t b?
 
-Một bảng phiếu chung, phân biệt bằng `LoaiPhieu`.
+M?t b?ng phi?u chung, ph�n bi?t b?ng `LoaiPhieu`.
 
 ```sql
 CREATE TABLE dbo.PhieuThietBi (
@@ -436,7 +436,7 @@ CREATE TABLE dbo.PhieuThietBi (
 );
 ```
 
-Loại phiếu:
+Lo?i phi?u:
 
 ```text
 NHAP_KHO
@@ -450,7 +450,7 @@ KIEM_KE
 THANH_LY
 ```
 
-### Chi tiết phiếu
+### Chi ti?t phi?u
 
 ```sql
 CREATE TABLE dbo.PhieuThietBiChiTiet (
@@ -477,7 +477,7 @@ CREATE TABLE dbo.PhieuThietBiChiTiet (
 
 ---
 
-## 11. Lịch sử thiết bị
+## 11. L?ch s? thi?t b?
 
 ```sql
 CREATE TABLE dbo.LichSuThietBi (
@@ -510,7 +510,7 @@ CREATE TABLE dbo.LichSuThietBi (
 
 ---
 
-## 12. File đính kèm
+## 12. File d�nh k�m
 
 ```sql
 CREATE TABLE dbo.TepDinhKem (
@@ -534,83 +534,83 @@ CREATE TABLE dbo.TepDinhKem (
 
 ---
 
-## 13. Trạng thái thiết bị mặc định
+## 13. Tr?ng th�i thi?t b? m?c d?nh
 
 ```sql
 INSERT INTO dbo.DmDungChung (NhomDanhMuc, Ma, Ten, SapXep)
 VALUES
-(N'TRANG_THAI_TB', N'MOI_NHAP', N'Mới nhập', 1),
+(N'TRANG_THAI_TB', N'MOI_NHAP', N'M?i nh?p', 1),
 (N'TRANG_THAI_TB', N'TRONG_KHO', N'Trong kho', 2),
-(N'TRANG_THAI_TB', N'DANG_SU_DUNG', N'Đang sử dụng', 3),
-(N'TRANG_THAI_TB', N'DANG_SUA_CHUA', N'Đang sửa chữa', 4),
-(N'TRANG_THAI_TB', N'DANG_BAO_TRI', N'Đang bảo trì/bảo dưỡng', 5),
-(N'TRANG_THAI_TB', N'CHO_THANH_LY', N'Chờ thanh lý', 6),
-(N'TRANG_THAI_TB', N'DA_THANH_LY', N'Đã thanh lý', 7),
-(N'TRANG_THAI_TB', N'MAT_HUY', N'Mất/Hủy', 8);
+(N'TRANG_THAI_TB', N'DANG_SU_DUNG', N'�ang s? d?ng', 3),
+(N'TRANG_THAI_TB', N'DANG_SUA_CHUA', N'�ang s?a ch?a', 4),
+(N'TRANG_THAI_TB', N'DANG_BAO_TRI', N'�ang b?o tr�/b?o du?ng', 5),
+(N'TRANG_THAI_TB', N'CHO_THANH_LY', N'Ch? thanh l�', 6),
+(N'TRANG_THAI_TB', N'DA_THANH_LY', N'�� thanh l�', 7),
+(N'TRANG_THAI_TB', N'MAT_HUY', N'M?t/H?y', 8);
 ```
 
 ---
 
-## 14. Quy trình nghiệp vụ
+## 14. Quy tr�nh nghi?p v?
 
-### 14.1. Nhập thiết bị
+### 14.1. Nh?p thi?t b?
 
-1. Tạo hồ sơ thiết bị.
-2. Gán trạng thái `MOI_NHAP` hoặc `TRONG_KHO`.
-3. Nhập thông số động theo nhóm thiết bị.
-4. Tạo phiếu `NHAP_KHO`.
-5. Ghi lịch sử thiết bị.
+1. T?o h? so thi?t b?.
+2. G�n tr?ng th�i `MOI_NHAP` ho?c `TRONG_KHO`.
+3. Nh?p th�ng s? d?ng theo nh�m thi?t b?.
+4. T?o phi?u `NHAP_KHO`.
+5. Ghi l?ch s? thi?t b?.
 
-### 14.2. Cấp phát thiết bị
+### 14.2. C?p ph�t thi?t b?
 
-1. Chọn thiết bị trong kho.
-2. Chọn phòng ban, bộ phận, người sử dụng.
-3. Tạo phiếu `CAP_PHAT`.
-4. Cập nhật trạng thái `DANG_SU_DUNG`.
-5. Ghi lịch sử thiết bị.
+1. Ch?n thi?t b? trong kho.
+2. Ch?n ph�ng ban, b? ph?n, ngu?i s? d?ng.
+3. T?o phi?u `CAP_PHAT`.
+4. C?p nh?t tr?ng th�i `DANG_SU_DUNG`.
+5. Ghi l?ch s? thi?t b?.
 
-### 14.3. Điều chuyển thiết bị
+### 14.3. �i?u chuy?n thi?t b?
 
-1. Chọn thiết bị đang sử dụng.
-2. Chọn nơi chuyển đến.
-3. Tạo phiếu `LUAN_CHUYEN`.
-4. Cập nhật phòng ban, bộ phận, người sử dụng mới.
-5. Ghi lịch sử thiết bị.
+1. Ch?n thi?t b? dang s? d?ng.
+2. Ch?n noi chuy?n d?n.
+3. T?o phi?u `LUAN_CHUYEN`.
+4. C?p nh?t ph�ng ban, b? ph?n, ngu?i s? d?ng m?i.
+5. Ghi l?ch s? thi?t b?.
 
-### 14.4. Sửa chữa
+### 14.4. S?a ch?a
 
-1. Tạo phiếu `SUA_CHUA`.
-2. Cập nhật trạng thái `DANG_SUA_CHUA`.
-3. Ghi chi phí sửa chữa.
-4. Khi hoàn thành, cập nhật lại trạng thái trước đó hoặc `DANG_SU_DUNG`.
-5. Ghi lịch sử.
+1. T?o phi?u `SUA_CHUA`.
+2. C?p nh?t tr?ng th�i `DANG_SUA_CHUA`.
+3. Ghi chi ph� s?a ch?a.
+4. Khi ho�n th�nh, c?p nh?t l?i tr?ng th�i tru?c d� ho?c `DANG_SU_DUNG`.
+5. Ghi l?ch s?.
 
-### 14.5. Bảo trì/bảo dưỡng
+### 14.5. B?o tr�/b?o du?ng
 
-1. Tạo phiếu `BAO_TRI`.
-2. Chọn các công việc bảo trì.
-3. Nhập ngày bắt đầu, ngày kết thúc, chi phí.
-4. Cập nhật lịch sử.
+1. T?o phi?u `BAO_TRI`.
+2. Ch?n c�c c�ng vi?c b?o tr�.
+3. Nh?p ng�y b?t d?u, ng�y k?t th�c, chi ph�.
+4. C?p nh?t l?ch s?.
 
-### 14.6. Kiểm kê
+### 14.6. Ki?m k�
 
-1. Tạo đợt kiểm kê.
-2. Quét QR hoặc chọn thiết bị.
-3. Cập nhật trạng thái kiểm kê: Đúng vị trí, Sai vị trí, Không tìm thấy, Phát sinh mới.
-4. Ghi lịch sử kiểm kê.
+1. T?o d?t ki?m k�.
+2. Qu�t QR ho?c ch?n thi?t b?.
+3. C?p nh?t tr?ng th�i ki?m k�: ��ng v? tr�, Sai v? tr�, Kh�ng t�m th?y, Ph�t sinh m?i.
+4. Ghi l?ch s? ki?m k�.
 
-### 14.7. Thanh lý
+### 14.7. Thanh l�
 
-1. Tạo phiếu `THANH_LY`.
-2. Chọn loại thanh lý, lý do thanh lý.
-3. Cập nhật trạng thái `DA_THANH_LY`.
-4. Ghi lịch sử.
+1. T?o phi?u `THANH_LY`.
+2. Ch?n lo?i thanh l�, l� do thanh l�.
+3. C?p nh?t tr?ng th�i `DA_THANH_LY`.
+4. Ghi l?ch s?.
 
 ---
 
-## 15. Mapping từ Oracle cũ sang hệ thống mới
+## 15. Mapping t? Oracle cu sang h? th?ng m?i
 
-| Oracle cũ | SQL Server mới |
+| Oracle cu | SQL Server m?i |
 |---|---|
 | WTB_00_HO_SO_THIET_BI | ThietBi |
 | WTB_00_HO_SO_THIET_BI_CHI_TET | ThietBiThongSo |
@@ -626,37 +626,37 @@ VALUES
 
 ---
 
-## 16. Yêu cầu dành cho Codex
+## 16. Y�u c?u d�nh cho Codex
 
-Codex cần thực hiện theo thứ tự:
+Codex c?n th?c hi?n theo th? t?:
 
-1. Tạo Entity SQL Server theo thiết kế trên.
-2. Tạo DbContext.
-3. Tạo DTO cho:
-   - Danh mục.
-   - Nhóm thiết bị.
-   - Thiết bị.
-   - Thông số thiết bị.
-   - Phiếu thiết bị.
-   - Lịch sử thiết bị.
-4. Tạo Business Interface và Business Implementation.
-5. Tạo Controller.
-6. Tạo API:
-   - CRUD danh mục.
-   - CRUD nhóm thiết bị.
-   - CRUD thiết bị.
-   - API lấy thông số theo nhóm thiết bị.
-   - API lưu thiết bị kèm thông số động.
-   - API tạo phiếu nghiệp vụ.
-   - API xem lịch sử thiết bị.
-7. Tạo script seed dữ liệu danh mục mặc định.
-8. Tạo script mapping Oracle cũ sang SQL Server mới.
+1. T?o Entity SQL Server theo thi?t k? tr�n.
+2. T?o DbContext.
+3. T?o DTO cho:
+   - Danh m?c.
+   - Nh�m thi?t b?.
+   - Thi?t b?.
+   - Th�ng s? thi?t b?.
+   - Phi?u thi?t b?.
+   - L?ch s? thi?t b?.
+4. T?o Business Interface v� Business Implementation.
+5. T?o Controller.
+6. T?o API:
+   - CRUD danh m?c.
+   - CRUD nh�m thi?t b?.
+   - CRUD thi?t b?.
+   - API l?y th�ng s? theo nh�m thi?t b?.
+   - API luu thi?t b? k�m th�ng s? d?ng.
+   - API t?o phi?u nghi?p v?.
+   - API xem l?ch s? thi?t b?.
+7. T?o script seed d? li?u danh m?c m?c d?nh.
+8. T?o script mapping Oracle cu sang SQL Server m?i.
 
-Nguyên tắc code:
+Nguy�n t?c code:
 
-- Dùng async/await.
-- Business xử lý nghiệp vụ, Controller chỉ gọi Business.
-- Không để logic nghiệp vụ trong Controller.
-- Trạng thái thiết bị không nhập tự do, phải lấy từ danh mục.
-- Khi tạo phiếu nghiệp vụ phải ghi lịch sử thiết bị.
-- Khi thay đổi phòng ban/người sử dụng phải ghi lịch sử thiết bị.
+- D�ng async/await.
+- Business x? l� nghi?p v?, Controller ch? g?i Business.
+- Kh�ng d? logic nghi?p v? trong Controller.
+- Tr?ng th�i thi?t b? kh�ng nh?p t? do, ph?i l?y t? danh m?c.
+- Khi t?o phi?u nghi?p v? ph?i ghi l?ch s? thi?t b?.
+- Khi thay d?i ph�ng ban/ngu?i s? d?ng ph?i ghi l?ch s? thi?t b?.

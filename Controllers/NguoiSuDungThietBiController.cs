@@ -40,7 +40,7 @@ namespace QlThietBi.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(NguoiSuDungThietBiDto), 200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<NguoiSuDungThietBiDto>> GetUser(Guid id)
+        public async Task<ActionResult<NguoiSuDungThietBiDto>> GetUser(int id)
         {
             var result = await business.GetUserByIdAsync(id);
             if (result == null)
@@ -56,10 +56,10 @@ namespace QlThietBi.Controllers
         /// <remarks>
         /// Request mẫu:
         /// {
-        ///   "id": "guid?",
+        ///   "id": "int?",
         ///   "maNguoiDung": "ND001",
         ///   "tenNguoiDung": "Nguyễn Văn A",
-        ///   "donViBoPhanId": "guid?",
+        ///   "donViBoPhanId": "int?",
         ///   "chucVu": "Kỹ sư",
         ///   "soDienThoai": "0123456789",
         ///   "email": "a@example.com",
@@ -84,7 +84,7 @@ namespace QlThietBi.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> DeleteUser(Guid id)
+        public async Task<ActionResult> DeleteUser(int id)
         {
             var removed = await business.DeleteUserAsync(id);
             if (!removed)
@@ -95,3 +95,5 @@ namespace QlThietBi.Controllers
         }
     }
 }
+
+

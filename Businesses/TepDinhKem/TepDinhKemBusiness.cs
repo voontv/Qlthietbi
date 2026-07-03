@@ -18,7 +18,7 @@ namespace QlThietBi.Businesses.TepDinhKem
             this.context = context;
         }
 
-        public async Task<IEnumerable<TepDinhKemDto>> GetAttachmentsAsync(string doiTuongLoai, Guid doiTuongId)
+        public async Task<IEnumerable<TepDinhKemDto>> GetAttachmentsAsync(string doiTuongLoai, int doiTuongId)
         {
             return await context.TepDinhKems
                 .Where(x => x.DoiTuongLoai == doiTuongLoai && x.DoiTuongId == doiTuongId)
@@ -36,7 +36,7 @@ namespace QlThietBi.Businesses.TepDinhKem
                 .ToListAsync();
         }
 
-        public async Task<TepDinhKemDto?> GetAttachmentByIdAsync(Guid id)
+        public async Task<TepDinhKemDto?> GetAttachmentByIdAsync(int id)
         {
             var entity = await context.TepDinhKems.FindAsync(id);
             if (entity == null)
@@ -75,7 +75,6 @@ namespace QlThietBi.Businesses.TepDinhKem
             {
                 entity = new global::QlThietBi.Models.TepDinhKem
                 {
-                    Id = Guid.NewGuid(),
                     DoiTuongLoai = request.DoiTuongLoai,
                     DoiTuongId = request.DoiTuongId,
                     TenFile = request.TenFile,
@@ -103,7 +102,7 @@ namespace QlThietBi.Businesses.TepDinhKem
             };
         }
 
-        public async Task<bool> DeleteAttachmentAsync(Guid id)
+        public async Task<bool> DeleteAttachmentAsync(int id)
         {
             var entity = await context.TepDinhKems.FindAsync(id);
             if (entity == null)
@@ -117,3 +116,5 @@ namespace QlThietBi.Businesses.TepDinhKem
         }
     }
 }
+
+

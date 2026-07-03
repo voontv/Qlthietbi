@@ -7,6 +7,8 @@ using QlThietBi.AutoConfig;
 using QlThietBi.DTO.Request;
 using QlThietBi.DTO.Response;
 using QlThietBi.Models;
+using DonViBoPhanModel = QlThietBi.Models.DonViBoPhan;
+using NguoiSuDungThietBiModel = QlThietBi.Models.NguoiSuDungThietBi;
 using ThietBiModel = QlThietBi.Models.ThietBi;
 
 namespace QlThietBi.Businesses.ThietBi
@@ -66,7 +68,6 @@ namespace QlThietBi.Businesses.ThietBi
             {
                 entity = new DmDungChung
                 {
-                    Id = Guid.NewGuid(),
                     NhomDanhMuc = request.NhomDanhMuc,
                     Ma = request.Ma,
                     Ten = request.Ten,
@@ -92,7 +93,7 @@ namespace QlThietBi.Businesses.ThietBi
             };
         }
 
-        public async Task<bool> XoaDanhMucDungChungAsync(Guid id)
+        public async Task<bool> XoaDanhMucDungChungAsync(int id)
         {
             var entity = await context.DmDungChungs.FindAsync(id);
             if (entity == null)
@@ -154,7 +155,6 @@ namespace QlThietBi.Businesses.ThietBi
             {
                 entity = new NhomThietBi
                 {
-                    Id = Guid.NewGuid(),
                     MaNhomThietBi = request.MaNhomThietBi,
                     TenNhomThietBi = request.TenNhomThietBi,
                     KyHieu = request.KyHieu,
@@ -182,7 +182,7 @@ namespace QlThietBi.Businesses.ThietBi
             };
         }
 
-        public async Task<bool> XoaNhomThietBiAsync(Guid id)
+        public async Task<bool> XoaNhomThietBiAsync(int id)
         {
             var entity = await context.NhomThietBis.FindAsync(id);
             if (entity == null)
@@ -236,6 +236,201 @@ namespace QlThietBi.Businesses.ThietBi
                 GhiChu = x.GhiChu,
                 IsActive = x.IsActive
             }).ToList();
+        }
+
+        public async Task<ThongKeThietBiDto> ThongKeThietBiAsync(QueryThongKeThietBiRequest request)
+        {
+            var query = context.ThietBis
+                .Where(x => x.IsActive);
+
+            if (request.PhongBanId.HasValue)
+            {
+                query = query.Where(x => x.PhongBanId == request.PhongBanId.Value);
+            }
+
+            if (request.BoPhanId.HasValue)
+            {
+                query = query.Where(x => x.BoPhanId == request.BoPhanId.Value);
+            }
+
+            if (request.NhomThietBiId.HasValue)
+            {
+                var nhomIds = await context.NhomThietBis
+                    .Where(x => x.Id == request.NhomThietBiId.Value || x.ParentId == request.NhomThietBiId.Value)
+                    .Select(x => x.Id)
+                    .ToListAsync();
+
+                if (!nhomIds.Contains(request.NhomThietBiId.Value))
+                {
+                    nhomIds.Add(request.NhomThietBiId.Value);
+                }
+
+                query = query.Where(x => nhomIds.Contains(x.NhomThietBiId));
+            }
+
+            var devices = await query
+                .OrderBy(x => x.MaThietBi)
+                .ToListAsync();
+
+            var nhomThietBiMap = await context.NhomThietBis
+                .Select(x => new NhomThietBiDto
+                {
+                    Id = x.Id,
+                    MaNhomThietBi = x.MaNhomThietBi,
+                    TenNhomThietBi = x.TenNhomThietBi,
+                    KyHieu = x.KyHieu,
+                    ParentId = x.ParentId,
+                    MoTa = x.MoTa,
+                    SapXep = x.SapXep,
+                    IsActive = x.IsActive
+                })
+                .ToDictionaryAsync(x => x.Id);
+            var donViMap = await context.DonViBoPhans
+                .ToDictionaryAsync(x => x.Id);
+            var nguoiSuDungMap = await context.NguoiSuDungThietBis
+                .ToDictionaryAsync(x => x.Id);
+            var trangThaiMap = await context.DmDungChungs
+                .Where(x => x.NhomDanhMuc == "TRANG_THAI_TB")
+                .ToDictionaryAsync(x => x.Id);
+
+            ThongKeThietBiNhomDto TaoThongKeDonVi(int? id, IEnumerable<ThietBiModel> items, string tenMacDinh)
+            {
+                DonViBoPhanModel? donVi = null;
+                if (id.HasValue)
+                {
+                    donViMap.TryGetValue(id.Value, out donVi);
+                }
+
+                return new ThongKeThietBiNhomDto
+                {
+                    Id = id,
+                    Ma = donVi?.MaDonVi,
+                    Ten = donVi?.TenDonVi ?? tenMacDinh,
+                    SoLuong = items.Count(),
+                    TongNguyenGia = items.Sum(x => x.NguyenGia ?? 0)
+                };
+            }
+
+            ThongKeThietBiNhomDto TaoThongKeNhomThietBi(int id, IEnumerable<ThietBiModel> items)
+            {
+                nhomThietBiMap.TryGetValue(id, out var nhomThietBi);
+
+                return new ThongKeThietBiNhomDto
+                {
+                    Id = id,
+                    Ma = nhomThietBi?.MaNhomThietBi,
+                    Ten = nhomThietBi?.TenNhomThietBi ?? "Không xác định",
+                    SoLuong = items.Count(),
+                    TongNguyenGia = items.Sum(x => x.NguyenGia ?? 0)
+                };
+            }
+
+            ThongKeThietBiNhomDto TaoThongKeTrangThai(int id, IEnumerable<ThietBiModel> items)
+            {
+                trangThaiMap.TryGetValue(id, out var trangThai);
+
+                return new ThongKeThietBiNhomDto
+                {
+                    Id = id,
+                    Ma = trangThai?.Ma,
+                    Ten = trangThai?.Ten ?? "Không xác định",
+                    SoLuong = items.Count(),
+                    TongNguyenGia = items.Sum(x => x.NguyenGia ?? 0)
+                };
+            }
+
+            var result = new ThongKeThietBiDto
+            {
+                PhongBanId = request.PhongBanId,
+                BoPhanId = request.BoPhanId,
+                NhomThietBiId = request.NhomThietBiId,
+                TongSoLuong = devices.Count,
+                TongNguyenGia = devices.Sum(x => x.NguyenGia ?? 0),
+                TheoPhongBan = devices
+                    .GroupBy(x => x.PhongBanId)
+                    .Select(x => TaoThongKeDonVi(x.Key, x, "Chưa có phòng ban"))
+                    .OrderByDescending(x => x.SoLuong)
+                    .ThenBy(x => x.Ten)
+                    .ToList(),
+                TheoBoPhan = devices
+                    .GroupBy(x => x.BoPhanId)
+                    .Select(x => TaoThongKeDonVi(x.Key, x, "Chưa có bộ phận"))
+                    .OrderByDescending(x => x.SoLuong)
+                    .ThenBy(x => x.Ten)
+                    .ToList(),
+                TheoNhomThietBi = devices
+                    .GroupBy(x => x.NhomThietBiId)
+                    .Select(x => TaoThongKeNhomThietBi(x.Key, x))
+                    .OrderByDescending(x => x.SoLuong)
+                    .ThenBy(x => x.Ten)
+                    .ToList(),
+                TheoTrangThai = devices
+                    .GroupBy(x => x.TrangThaiId)
+                    .Select(x => TaoThongKeTrangThai(x.Key, x))
+                    .OrderByDescending(x => x.SoLuong)
+                    .ThenBy(x => x.Ten)
+                    .ToList(),
+                DanhSach = devices.Select(x =>
+                {
+                    nhomThietBiMap.TryGetValue(x.NhomThietBiId, out var nhomThietBi);
+                    NhomThietBiDto? danhMucThietBi = nhomThietBi;
+                    if (nhomThietBi?.ParentId.HasValue == true)
+                    {
+                        nhomThietBiMap.TryGetValue(nhomThietBi.ParentId.Value, out danhMucThietBi);
+                    }
+
+                    trangThaiMap.TryGetValue(x.TrangThaiId, out var trangThai);
+                    DonViBoPhanModel? phongBan = null;
+                    DonViBoPhanModel? boPhan = null;
+                    NguoiSuDungThietBiModel? nguoiSuDung = null;
+                    if (x.PhongBanId.HasValue)
+                    {
+                        donViMap.TryGetValue(x.PhongBanId.Value, out phongBan);
+                    }
+
+                    if (x.BoPhanId.HasValue)
+                    {
+                        donViMap.TryGetValue(x.BoPhanId.Value, out boPhan);
+                    }
+
+                    if (x.NguoiSuDungId.HasValue)
+                    {
+                        nguoiSuDungMap.TryGetValue(x.NguoiSuDungId.Value, out nguoiSuDung);
+                    }
+
+                    return new ThongKeThietBiItemDto
+                    {
+                        Id = x.Id,
+                        MaThietBi = x.MaThietBi,
+                        MaThietBiCu = x.MaThietBiCu,
+                        TenThietBi = x.TenThietBi,
+                        NhomThietBiId = x.NhomThietBiId,
+                        MaNhomThietBi = nhomThietBi?.MaNhomThietBi,
+                        TenNhomThietBi = nhomThietBi?.TenNhomThietBi,
+                        DanhMucThietBiId = danhMucThietBi?.Id,
+                        MaDanhMucThietBi = danhMucThietBi?.MaNhomThietBi,
+                        TenDanhMucThietBi = danhMucThietBi?.TenNhomThietBi,
+                        TrangThaiId = x.TrangThaiId,
+                        MaTrangThai = trangThai?.Ma,
+                        TenTrangThai = trangThai?.Ten,
+                        PhongBanId = x.PhongBanId,
+                        MaPhongBan = phongBan?.MaDonVi,
+                        TenPhongBan = phongBan?.TenDonVi,
+                        BoPhanId = x.BoPhanId,
+                        MaBoPhan = boPhan?.MaDonVi,
+                        TenBoPhan = boPhan?.TenDonVi,
+                        NguoiSuDungId = x.NguoiSuDungId,
+                        MaNguoiSuDung = nguoiSuDung?.MaNguoiDung,
+                        TenNguoiSuDung = nguoiSuDung?.TenNguoiDung,
+                        NguyenGia = x.NguyenGia,
+                        NgayNhapThietBi = x.NgayNhapThietBi,
+                        NgayDuaVaoSuDung = x.NgayDuaVaoSuDung,
+                        GhiChu = x.GhiChu
+                    };
+                }).ToList()
+            };
+
+            return result;
         }
 
         public async Task<ThietBiDto> LuuThietBiAsync(CreateUpdateThietBiRequest request)
@@ -299,7 +494,6 @@ namespace QlThietBi.Businesses.ThietBi
             {
                 entity = new ThietBiModel
                 {
-                    Id = Guid.NewGuid(),
                     MaThietBi = request.MaThietBi,
                     MaThietBiCu = request.MaThietBiCu,
                     TenThietBi = request.TenThietBi,
@@ -333,6 +527,7 @@ namespace QlThietBi.Businesses.ThietBi
                 };
 
                 context.ThietBis.Add(entity);
+                await context.SaveChangesAsync();
                 await TaoLichSuThietBiAsync(entity, request, null, null, null, null, now, "NHAP_KHO");
             }
 
@@ -342,7 +537,7 @@ namespace QlThietBi.Businesses.ThietBi
             return await LayThietBiTheoIdAsync(entity.Id) ?? throw new InvalidOperationException("Không thể lấy thiết bị sau khi lưu.");
         }
 
-        public async Task<ThietBiDto?> LayThietBiTheoIdAsync(Guid id)
+        public async Task<ThietBiDto?> LayThietBiTheoIdAsync(int id)
         {
             var x = await context.ThietBis.FirstOrDefaultAsync(t => t.Id == id && t.IsActive);
             if (x == null)
@@ -401,7 +596,7 @@ namespace QlThietBi.Businesses.ThietBi
             return result;
         }
 
-        public async Task<bool> XoaThietBiAsync(Guid id)
+        public async Task<bool> XoaThietBiAsync(int id)
         {
             var entity = await context.ThietBis.FindAsync(id);
             if (entity == null)
@@ -415,7 +610,7 @@ namespace QlThietBi.Businesses.ThietBi
             return true;
         }
 
-        public async Task<IEnumerable<DmThongSoThietBiDto>> LayThongSoTheoNhomThietBiAsync(Guid nhomThietBiId)
+        public async Task<IEnumerable<DmThongSoThietBiDto>> LayThongSoTheoNhomThietBiAsync(int nhomThietBiId)
         {
             return await context.DmThongSoThietBis
                 .Where(x => x.NhomThietBiId == nhomThietBiId && x.IsActive)
@@ -465,7 +660,6 @@ namespace QlThietBi.Businesses.ThietBi
             {
                 entity = new DmThongSoThietBi
                 {
-                    Id = Guid.NewGuid(),
                     NhomThietBiId = request.NhomThietBiId,
                     MaThongSo = request.MaThongSo,
                     TenThongSo = request.TenThongSo,
@@ -496,7 +690,7 @@ namespace QlThietBi.Businesses.ThietBi
             };
         }
 
-        public async Task<bool> XoaThongSoThietBiAsync(Guid id)
+        public async Task<bool> XoaThongSoThietBiAsync(int id)
         {
             var entity = await context.DmThongSoThietBis.FindAsync(id);
             if (entity == null)
@@ -516,7 +710,6 @@ namespace QlThietBi.Businesses.ThietBi
             var now = DateTime.UtcNow;
             var phieu = new PhieuThietBi
             {
-                Id = Guid.NewGuid(),
                 SoPhieu = request.SoPhieu,
                 LoaiPhieu = request.LoaiPhieu,
                 NgayPhieu = request.NgayPhieu,
@@ -536,6 +729,7 @@ namespace QlThietBi.Businesses.ThietBi
             };
 
             context.PhieuThietBis.Add(phieu);
+            await context.SaveChangesAsync();
 
             if (request.ChiTiets != null)
             {
@@ -543,7 +737,6 @@ namespace QlThietBi.Businesses.ThietBi
                 {
                     var detailEntry = new PhieuThietBiChiTiet
                     {
-                        Id = Guid.NewGuid(),
                         PhieuThietBiId = phieu.Id,
                         CongViecId = detail.CongViecId,
                         ThongSoId = detail.ThongSoId,
@@ -647,7 +840,7 @@ namespace QlThietBi.Businesses.ThietBi
             };
         }
 
-        public async Task<IEnumerable<LichSuThietBiDto>> LayLichSuThietBiAsync(Guid thietBiId)
+        public async Task<IEnumerable<LichSuThietBiDto>> LayLichSuThietBiAsync(int thietBiId)
         {
             return await context.LichSuThietBis
                 .Where(x => x.ThietBiId == thietBiId)
@@ -672,7 +865,7 @@ namespace QlThietBi.Businesses.ThietBi
                 .ToListAsync();
         }
 
-        private async Task LuuThongSoCuaThietBiAsync(Guid thietBiId, IEnumerable<ThietBiThongSoValueRequest>? values, DateTime now)
+        private async Task LuuThongSoCuaThietBiAsync(int thietBiId, IEnumerable<ThietBiThongSoValueRequest>? values, DateTime now)
         {
             if (values == null)
             {
@@ -688,7 +881,6 @@ namespace QlThietBi.Businesses.ThietBi
                 {
                     context.ThietBiThongSos.Add(new ThietBiThongSo
                     {
-                        Id = Guid.NewGuid(),
                         ThietBiId = thietBiId,
                         ThongSoId = item.ThongSoId,
                         GiaTriText = item.GiaTriText,
@@ -712,11 +904,10 @@ namespace QlThietBi.Businesses.ThietBi
             await context.SaveChangesAsync();
         }
 
-        private Task TaoLichSuThietBiAsync(ThietBiModel current, CreateUpdateThietBiRequest request, Guid? trangThaiTruocId, Guid? phongBanTruocId, Guid? boPhanTruocId, Guid? nguoiSuDungTruocId, DateTime now, string loaiNghiepVu = "CAP_NHAT_THIET_BI", Guid? nghiepVuId = null)
+        private Task TaoLichSuThietBiAsync(ThietBiModel current, CreateUpdateThietBiRequest request, int? trangThaiTruocId, int? phongBanTruocId, int? boPhanTruocId, int? nguoiSuDungTruocId, DateTime now, string loaiNghiepVu = "CAP_NHAT_THIET_BI", int? nghiepVuId = null)
         {
             var history = new LichSuThietBi
             {
-                Id = Guid.NewGuid(),
                 ThietBiId = current.Id,
                 LoaiNghiepVu = loaiNghiepVu,
                 NghiepVuId = nghiepVuId ?? current.Id,
@@ -737,7 +928,7 @@ namespace QlThietBi.Businesses.ThietBi
             return Task.CompletedTask;
         }
 
-        private async Task<Guid> LayTrangThaiIdAsync(string nhomDanhMuc, string ma)
+        private async Task<int> LayTrangThaiIdAsync(string nhomDanhMuc, string ma)
         {
             var status = await context.DmDungChungs.FirstOrDefaultAsync(x => x.NhomDanhMuc == nhomDanhMuc && x.Ma == ma && x.IsActive);
             if (status == null)
@@ -749,3 +940,5 @@ namespace QlThietBi.Businesses.ThietBi
         }
     }
 }
+
+

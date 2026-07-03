@@ -1,14 +1,14 @@
-using System;
+﻿using System;
 
 namespace QlThietBi.Models
 {
     public class NhomThietBi
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string MaNhomThietBi { get; set; } = null!;
         public string TenNhomThietBi { get; set; } = null!;
         public string? KyHieu { get; set; }
-        public Guid? ParentId { get; set; }
+        public int? ParentId { get; set; }
         public string? MoTa { get; set; }
         public string? GhiChu { get; set; }
         public int? SapXep { get; set; }
@@ -21,3 +21,5 @@ namespace QlThietBi.Models
         public string? TenNguoiChinhSua { get; set; }
     }
 }
+
+

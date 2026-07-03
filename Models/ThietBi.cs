@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 
 namespace QlThietBi.Models
 {
     public class ThietBi
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string MaThietBi { get; set; } = null!;
         public string? MaThietBiCu { get; set; }
         public string TenThietBi { get; set; } = null!;
@@ -12,18 +12,18 @@ namespace QlThietBi.Models
         public string? Model { get; set; }
         public string? MaKeToan { get; set; }
         public string? MaThietBiCha { get; set; }
-        public Guid NhomThietBiId { get; set; }
-        public Guid TrangThaiId { get; set; }
-        public Guid? TrangThaiKiemKeId { get; set; }
-        public Guid? DonViTinhId { get; set; }
-        public Guid? NhanHieuId { get; set; }
-        public Guid? MauSacId { get; set; }
-        public Guid? NuocSanXuatId { get; set; }
-        public Guid? ChatLieuId { get; set; }
-        public Guid? DonViCungCapId { get; set; }
-        public Guid? PhongBanId { get; set; }
-        public Guid? BoPhanId { get; set; }
-        public Guid? NguoiSuDungId { get; set; }
+        public int NhomThietBiId { get; set; }
+        public int TrangThaiId { get; set; }
+        public int? TrangThaiKiemKeId { get; set; }
+        public int? DonViTinhId { get; set; }
+        public int? NhanHieuId { get; set; }
+        public int? MauSacId { get; set; }
+        public int? NuocSanXuatId { get; set; }
+        public int? ChatLieuId { get; set; }
+        public int? DonViCungCapId { get; set; }
+        public int? PhongBanId { get; set; }
+        public int? BoPhanId { get; set; }
+        public int? NguoiSuDungId { get; set; }
         public DateTime? NgayMua { get; set; }
         public DateTime? NgayNhapThietBi { get; set; }
         public DateTime? NgayDuaVaoSuDung { get; set; }
@@ -42,3 +42,5 @@ namespace QlThietBi.Models
         public string? TenNguoiChinhSua { get; set; }
     }
 }
+
+

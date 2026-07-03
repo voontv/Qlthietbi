@@ -1,22 +1,23 @@
-using System;
+﻿using System;
 
 namespace QlThietBi.DTO.Response
 {
     public class LichSuThietBiDto
     {
-        public Guid Id { get; set; }
-        public Guid ThietBiId { get; set; }
+        public int Id { get; set; }
+        public int ThietBiId { get; set; }
         public string LoaiNghiepVu { get; set; } = null!;
-        public Guid? NghiepVuId { get; set; }
-        public Guid? TrangThaiTruocId { get; set; }
-        public Guid? TrangThaiSauId { get; set; }
-        public Guid? PhongBanTruocId { get; set; }
-        public Guid? PhongBanSauId { get; set; }
-        public Guid? BoPhanTruocId { get; set; }
-        public Guid? BoPhanSauId { get; set; }
-        public Guid? NguoiSuDungTruocId { get; set; }
-        public Guid? NguoiSuDungSauId { get; set; }
+        public int? NghiepVuId { get; set; }
+        public int? TrangThaiTruocId { get; set; }
+        public int? TrangThaiSauId { get; set; }
+        public int? PhongBanTruocId { get; set; }
+        public int? PhongBanSauId { get; set; }
+        public int? BoPhanTruocId { get; set; }
+        public int? BoPhanSauId { get; set; }
+        public int? NguoiSuDungTruocId { get; set; }
+        public int? NguoiSuDungSauId { get; set; }
         public string? NoiDung { get; set; }
         public DateTime? NgayPhatSinh { get; set; }
     }
 }
+

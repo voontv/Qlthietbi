@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 
 namespace QlThietBi.DTO.Response
 {
     public class DmDungChungDto
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string NhomDanhMuc { get; set; } = null!;
         public string Ma { get; set; } = null!;
         public string Ten { get; set; } = null!;
@@ -13,3 +13,5 @@ namespace QlThietBi.DTO.Response
         public bool IsActive { get; set; }
     }
 }
+
+

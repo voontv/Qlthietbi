@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using QlThietBi.AutoConfig;
@@ -12,18 +12,21 @@ namespace QlThietBi.Businesses.ThietBi
     {
         Task<IEnumerable<DmDungChungDto>> LayDanhMucDungChungAsync(string nhomDanhMuc);
         Task<DmDungChungDto> LuuDanhMucDungChungAsync(CreateUpdateDmDungChungRequest request);
-        Task<bool> XoaDanhMucDungChungAsync(Guid id);
+        Task<bool> XoaDanhMucDungChungAsync(int id);
         Task<IEnumerable<NhomThietBiDto>> LayDanhSachNhomThietBiAsync();
         Task<NhomThietBiDto> LuuNhomThietBiAsync(CreateUpdateNhomThietBiRequest request);
-        Task<bool> XoaNhomThietBiAsync(Guid id);
+        Task<bool> XoaNhomThietBiAsync(int id);
         Task<IEnumerable<ThietBiDto>> LayDanhSachThietBiAsync();
+        Task<ThongKeThietBiDto> ThongKeThietBiAsync(QueryThongKeThietBiRequest request);
         Task<ThietBiDto> LuuThietBiAsync(CreateUpdateThietBiRequest request);
-        Task<ThietBiDto?> LayThietBiTheoIdAsync(Guid id);
-        Task<bool> XoaThietBiAsync(Guid id);
-        Task<IEnumerable<DmThongSoThietBiDto>> LayThongSoTheoNhomThietBiAsync(Guid nhomThietBiId);
+        Task<ThietBiDto?> LayThietBiTheoIdAsync(int id);
+        Task<bool> XoaThietBiAsync(int id);
+        Task<IEnumerable<DmThongSoThietBiDto>> LayThongSoTheoNhomThietBiAsync(int nhomThietBiId);
         Task<DmThongSoThietBiDto> LuuThongSoThietBiAsync(CreateUpdateDmThongSoThietBiRequest request);
-        Task<bool> XoaThongSoThietBiAsync(Guid id);
+        Task<bool> XoaThongSoThietBiAsync(int id);
         Task<PhieuThietBiDto> TaoPhieuThietBiAsync(CreatePhieuThietBiRequest request);
-        Task<IEnumerable<LichSuThietBiDto>> LayLichSuThietBiAsync(Guid thietBiId);
+        Task<IEnumerable<LichSuThietBiDto>> LayLichSuThietBiAsync(int thietBiId);
     }
 }
+
+

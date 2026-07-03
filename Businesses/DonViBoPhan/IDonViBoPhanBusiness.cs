@@ -1,4 +1,4 @@
-using QlThietBi.AutoConfig;
+﻿using QlThietBi.AutoConfig;
 using QlThietBi.DTO.Request;
 using QlThietBi.DTO.Response;
 using System;
@@ -11,8 +11,10 @@ namespace QlThietBi.Businesses.DonViBoPhan
     public interface IDonViBoPhanBusiness
     {
         Task<IEnumerable<DonViBoPhanDto>> GetUnitsAsync();
-        Task<DonViBoPhanDto?> GetUnitByIdAsync(Guid id);
+        Task<DonViBoPhanDto?> GetUnitByIdAsync(int id);
         Task<DonViBoPhanDto> SaveUnitAsync(CreateUpdateDonViBoPhanRequest request);
-        Task<bool> DeleteUnitAsync(Guid id);
+        Task<bool> DeleteUnitAsync(int id);
     }
 }
+
+

@@ -1,6 +1,6 @@
-# QLTB FE Implementation Guide
+﻿# QLTB FE Implementation Guide
 
-Last updated: 2026-07-02
+Last updated: 2026-07-03
 
 ## Base
 
@@ -18,7 +18,7 @@ Example:
 {
   "ma_thiet_bi": "MTI.0001",
   "ten_thiet_bi": "May tinh",
-  "nhom_thiet_bi_id": "guid"
+  "nhom_thiet_bi_id": 1
 }
 ```
 
@@ -73,6 +73,54 @@ GET /api/ThietBi/danh-muc/TRANG_THAI_TB
 GET /api/DonViBoPhan
 GET /api/NguoiSuDungThietBi
 ```
+
+For dashboard statistics and filtered search, prefer:
+
+```http
+GET /api/ThietBi/thiet-bi/thong-ke
+GET /api/ThietBi/thiet-bi/thong-ke?phong_ban_id={int}
+GET /api/ThietBi/thiet-bi/thong-ke?bo_phan_id={int}
+GET /api/ThietBi/thiet-bi/thong-ke?nhom_thiet_bi_id={int}
+GET /api/ThietBi/thiet-bi/thong-ke?phong_ban_id={int}&bo_phan_id={int}&nhom_thiet_bi_id={int}
+```
+
+All query params are optional. If FE does not send a param, BE treats that filter as "all".
+
+When `nhom_thiet_bi_id` is a parent group, BE includes devices in that parent group and its direct child groups.
+
+Main response fields:
+
+- `phong_ban_id`
+- `bo_phan_id`
+- `nhom_thiet_bi_id`
+- `tong_so_luong`
+- `tong_nguyen_gia`
+- `theo_phong_ban`
+- `theo_bo_phan`
+- `theo_nhom_thiet_bi`
+- `theo_trang_thai`
+- `danh_sach`
+
+Each group item has:
+
+- `id`
+- `ma`
+- `ten`
+- `so_luong`
+- `tong_nguyen_gia`
+
+Each item in `danh_sach` contains the device fields needed for the result table, including old code, group/status names, department/unit names, price, usage dates, and note.
+
+For the search result table, FE should show these fields from each `danh_sach` item:
+
+- `ma_thiet_bi`
+- `ten_thiet_bi`
+- `ten_trang_thai`
+- `ten_nguoi_su_dung`
+- `ten_phong_ban`
+- `ten_bo_phan`
+- `ten_danh_muc_thiet_bi`
+- `ten_nhom_thiet_bi`
 
 ### 2. Chi tiet thiet bi
 
@@ -129,12 +177,12 @@ Minimal payload:
   "id": null,
   "ma_thiet_bi": "MTI.9999",
   "ten_thiet_bi": "May tinh test",
-  "nhom_thiet_bi_id": "guid",
-  "trang_thai_id": "guid",
+  "nhom_thiet_bi_id": 1,
+  "trang_thai_id": 1,
   "is_active": true,
   "thong_so": [
     {
-      "thong_so_id": "guid",
+      "thong_so_id": 1,
       "gia_tri_text": null,
       "gia_tri_number": 8,
       "gia_tri_date": null,
@@ -199,7 +247,7 @@ Payload:
 ```json
 {
   "id": null,
-  "nhom_thiet_bi_id": "guid",
+  "nhom_thiet_bi_id": 1,
   "ma_thong_so": "RAM",
   "ten_thong_so": "RAM",
   "kieu_du_lieu": "NUMBER",
@@ -233,10 +281,10 @@ Payload:
   "so_phieu": "LC-2026-0001",
   "loai_phieu": "LUAN_CHUYEN",
   "ngay_phieu": "2026-07-02",
-  "thiet_bi_id": "guid",
-  "phong_ban_id": "guid",
+  "thiet_bi_id": 1,
+  "phong_ban_id": 1,
   "bo_phan_id": null,
-  "nguoi_su_dung_id": "guid",
+  "nguoi_su_dung_id": 1,
   "noi_dung": "Luan chuyen thiet bi",
   "chi_phi": null,
   "chi_tiets": []
@@ -312,3 +360,4 @@ Payload:
 - Parameter definition by group.
 - Shared catalog management.
 - Business slip creation screen for transfer, repair, maintenance, replacement, liquidation.
+

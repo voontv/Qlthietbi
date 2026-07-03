@@ -27,7 +27,7 @@ namespace QlThietBi.Controllers
         /// <response code="200">Danh sách tệp đính kèm trả về.</response>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<TepDinhKemDto>), 200)]
-        public async Task<ActionResult<IEnumerable<TepDinhKemDto>>> GetAttachments([FromQuery] string doiTuongLoai, [FromQuery] Guid doiTuongId)
+        public async Task<ActionResult<IEnumerable<TepDinhKemDto>>> GetAttachments([FromQuery] string doiTuongLoai, [FromQuery] int doiTuongId)
         {
             var result = await business.GetAttachmentsAsync(doiTuongLoai, doiTuongId);
             return Ok(result);
@@ -42,7 +42,7 @@ namespace QlThietBi.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(TepDinhKemDto), 200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<TepDinhKemDto>> GetAttachment(Guid id)
+        public async Task<ActionResult<TepDinhKemDto>> GetAttachment(int id)
         {
             var result = await business.GetAttachmentByIdAsync(id);
             if (result == null)
@@ -58,9 +58,9 @@ namespace QlThietBi.Controllers
         /// <remarks>
         /// Request mẫu:
         /// {
-        ///   "id": "guid?",
+        ///   "id": "int?",
         ///   "doiTuongLoai": "ThietBi",
-        ///   "doiTuongId": "guid",
+        ///   "doiTuongId": "int",
         ///   "tenFile": "file.pdf",
         ///   "duongDan": "/uploads/file.pdf",
         ///   "loaiFile": "application/pdf",
@@ -86,7 +86,7 @@ namespace QlThietBi.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> DeleteAttachment(Guid id)
+        public async Task<ActionResult> DeleteAttachment(int id)
         {
             var removed = await business.DeleteAttachmentAsync(id);
             if (!removed)
@@ -97,3 +97,5 @@ namespace QlThietBi.Controllers
         }
     }
 }
+
+

@@ -35,8 +35,8 @@ WHEN MATCHED THEN
         MaNguoiChinhSua = N'0044',
         TenNguoiChinhSua = N'Trương Văn Voôn'
 WHEN NOT MATCHED THEN
-    INSERT (Id, MaNhomThietBi, TenNhomThietBi, KyHieu, ParentId, MoTa, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-    VALUES (NEWID(), source.MaNhomThietBi, source.TenNhomThietBi, source.KyHieu, NULL, source.MoTa, source.SapXep, 1, SYSDATETIME(), N'0044', N'Trương Văn Voôn');
+    INSERT (MaNhomThietBi, TenNhomThietBi, KyHieu, ParentId, MoTa, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+    VALUES (source.MaNhomThietBi, source.TenNhomThietBi, source.KyHieu, NULL, source.MoTa, source.SapXep, 1, SYSDATETIME(), N'0044', N'Trương Văn Voôn');
 IF OBJECT_ID('tempdb..#NhomThietBiCu') IS NOT NULL
     DROP TABLE #NhomThietBiCu;
 CREATE TABLE #NhomThietBiCu (
@@ -187,8 +187,8 @@ WHEN MATCHED THEN
         MaNguoiChinhSua = N'0044',
         TenNguoiChinhSua = N'Trương Văn Voôn'
 WHEN NOT MATCHED THEN
-    INSERT (Id, MaNhomThietBi, TenNhomThietBi, KyHieu, ParentId, MoTa, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-    VALUES (NEWID(), source.MaNhomThietBi, source.TenNhomThietBi, source.KyHieu, source.ParentId, source.MoTa, source.SapXep, 1, SYSDATETIME(), N'0044', N'Trương Văn Voôn');
+    INSERT (MaNhomThietBi, TenNhomThietBi, KyHieu, ParentId, MoTa, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+    VALUES (source.MaNhomThietBi, source.TenNhomThietBi, source.KyHieu, source.ParentId, source.MoTa, source.SapXep, 1, SYSDATETIME(), N'0044', N'Trương Văn Voôn');
 
 UPDATE child
 SET child.ParentId = parent.Id

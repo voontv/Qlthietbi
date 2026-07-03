@@ -40,7 +40,7 @@ namespace QlThietBi.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(DonViBoPhanDto), 200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<DonViBoPhanDto>> GetUnit(Guid id)
+        public async Task<ActionResult<DonViBoPhanDto>> GetUnit(int id)
         {
             var result = await business.GetUnitByIdAsync(id);
             if (result == null)
@@ -56,10 +56,10 @@ namespace QlThietBi.Controllers
         /// <remarks>
         /// Request mẫu:
         /// {
-        ///   "id": "guid?",
+        ///   "id": "int?",
         ///   "maDonVi": "DV001",
         ///   "tenDonVi": "Phòng Kỹ thuật",
-        ///   "parentId": "guid?",
+        ///   "parentId": "int?",
         ///   "loaiDonVi": "PHONG_BAN",
         ///   "ghiChu": "",
         ///   "sapXep": 1,
@@ -83,7 +83,7 @@ namespace QlThietBi.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> DeleteUnit(Guid id)
+        public async Task<ActionResult> DeleteUnit(int id)
         {
             var removed = await business.DeleteUnitAsync(id);
             if (!removed)
@@ -94,3 +94,5 @@ namespace QlThietBi.Controllers
         }
     }
 }
+
+

@@ -194,8 +194,8 @@ WHEN MATCHED THEN
         target.MaNguoiChinhSua = N'0044',
         target.TenNguoiChinhSua = N'Trương Văn Voôn'
 WHEN NOT MATCHED THEN
-    INSERT (Id, NhomDanhMuc, Ma, Ten, GhiChu, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
-    VALUES (NEWID(), source.NhomDanhMuc, source.Ma, source.Ten, source.GhiChu, source.SapXep, 1, SYSDATETIME(), N'0044', N'Trương Văn Voôn');
+    INSERT (NhomDanhMuc, Ma, Ten, GhiChu, SapXep, IsActive, NgayKhoiTao, MaNguoiNhap, TenNguoiNhap)
+    VALUES (source.NhomDanhMuc, source.Ma, source.Ten, source.GhiChu, source.SapXep, 1, SYSDATETIME(), N'0044', N'Trương Văn Voôn');
 
 COMMIT TRANSACTION;
 

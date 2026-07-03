@@ -424,9 +424,10 @@ Do not commit:
 
 ## Recommended Next Steps
 
-1. Add mapping scripts/tables or notes for old code to new `Guid` IDs.
+1. Add mapping scripts/tables or notes for old code to new `int identity` IDs.
 2. Convert real equipment records after user provides the old equipment table export.
 3. Add validation in `ThietBiBusiness` so IDs belong to correct `DmDungChung.NhomDanhMuc`.
 4. Review whether old `TRANG_THAI_TB` codes should map to standard new statuses rather than remain as active choices.
 5. Decide whether to upgrade target framework from `net7.0` to `net8.0`.
 6. Review `AutoMapper` package warning.
+

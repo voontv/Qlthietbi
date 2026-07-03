@@ -1,12 +1,12 @@
-using System;
+﻿using System;
 
 namespace QlThietBi.DTO.Response
 {
     public class ThietBiThongSoDto
     {
-        public Guid Id { get; set; }
-        public Guid ThietBiId { get; set; }
-        public Guid ThongSoId { get; set; }
+        public int Id { get; set; }
+        public int ThietBiId { get; set; }
+        public int ThongSoId { get; set; }
         public string? GiaTriText { get; set; }
         public decimal? GiaTriNumber { get; set; }
         public DateTime? GiaTriDate { get; set; }
@@ -14,3 +14,4 @@ namespace QlThietBi.DTO.Response
         public string? GhiChu { get; set; }
     }
 }
+

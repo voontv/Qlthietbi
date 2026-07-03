@@ -36,7 +36,7 @@ namespace QlThietBi.Businesses.DonViBoPhan
                 .ToListAsync();
         }
 
-        public async Task<DonViBoPhanDto?> GetUnitByIdAsync(Guid id)
+        public async Task<DonViBoPhanDto?> GetUnitByIdAsync(int id)
         {
             var entity = await context.DonViBoPhans.FindAsync(id);
             if (entity == null)
@@ -76,7 +76,6 @@ namespace QlThietBi.Businesses.DonViBoPhan
             {
                 entity = new global::QlThietBi.Models.DonViBoPhan
                 {
-                    Id = Guid.NewGuid(),
                     MaDonVi = request.MaDonVi,
                     TenDonVi = request.TenDonVi,
                     ParentId = request.ParentId,
@@ -104,7 +103,7 @@ namespace QlThietBi.Businesses.DonViBoPhan
             };
         }
 
-        public async Task<bool> DeleteUnitAsync(Guid id)
+        public async Task<bool> DeleteUnitAsync(int id)
         {
             var entity = await context.DonViBoPhans.FindAsync(id);
             if (entity == null)
@@ -119,3 +118,5 @@ namespace QlThietBi.Businesses.DonViBoPhan
         }
     }
 }
+
+

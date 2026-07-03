@@ -1,13 +1,13 @@
-using System;
+﻿using System;
 
 namespace QlThietBi.Models
 {
     public class PhieuThietBiChiTiet
     {
-        public Guid Id { get; set; }
-        public Guid PhieuThietBiId { get; set; }
-        public Guid? CongViecId { get; set; }
-        public Guid? ThongSoId { get; set; }
+        public int Id { get; set; }
+        public int PhieuThietBiId { get; set; }
+        public int? CongViecId { get; set; }
+        public int? ThongSoId { get; set; }
         public string? NoiDung { get; set; }
         public string? GiaTri { get; set; }
         public decimal? ChiPhi { get; set; }
@@ -21,3 +21,5 @@ namespace QlThietBi.Models
         public PhieuThietBi? PhieuThietBi { get; set; }
     }
 }
+
+

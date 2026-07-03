@@ -1,12 +1,12 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace QlThietBi.DTO.Request
 {
     public class CreatePhieuThietBiChiTietRequest
     {
-        public Guid? CongViecId { get; set; }
-        public Guid? ThongSoId { get; set; }
+        public int? CongViecId { get; set; }
+        public int? ThongSoId { get; set; }
         public string? NoiDung { get; set; }
         public string? GiaTri { get; set; }
         public decimal? ChiPhi { get; set; }
@@ -20,12 +20,12 @@ namespace QlThietBi.DTO.Request
         public string SoPhieu { get; set; } = null!;
         public string LoaiPhieu { get; set; } = null!;
         public DateTime NgayPhieu { get; set; }
-        public Guid ThietBiId { get; set; }
-        public Guid? PhongBanId { get; set; }
-        public Guid? BoPhanId { get; set; }
-        public Guid? NguoiSuDungId { get; set; }
-        public Guid? DonViThucHienId { get; set; }
-        public Guid? KetLuanId { get; set; }
+        public int ThietBiId { get; set; }
+        public int? PhongBanId { get; set; }
+        public int? BoPhanId { get; set; }
+        public int? NguoiSuDungId { get; set; }
+        public int? DonViThucHienId { get; set; }
+        public int? KetLuanId { get; set; }
         public string? NoiDung { get; set; }
         public decimal? ChiPhi { get; set; }
         public string? FileScan01 { get; set; }
@@ -34,3 +34,4 @@ namespace QlThietBi.DTO.Request
         public IEnumerable<CreatePhieuThietBiChiTietRequest>? ChiTiets { get; set; }
     }
 }
+

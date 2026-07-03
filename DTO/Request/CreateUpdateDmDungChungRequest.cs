@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 
 namespace QlThietBi.DTO.Request
 {
     public class CreateUpdateDmDungChungRequest
     {
-        public Guid? Id { get; set; }
+        public int? Id { get; set; }
         public string NhomDanhMuc { get; set; } = null!;
         public string Ma { get; set; } = null!;
         public string Ten { get; set; } = null!;
@@ -13,3 +13,4 @@ namespace QlThietBi.DTO.Request
         public bool IsActive { get; set; } = true;
     }
 }
+
