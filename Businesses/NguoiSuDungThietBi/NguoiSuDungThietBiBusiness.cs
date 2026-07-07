@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using QlThietBi.Businesses;
 using QlThietBi.DTO.Request;
 using QlThietBi.DTO.Response;
 using QlThietBi.Models;
@@ -12,10 +13,12 @@ namespace QlThietBi.Businesses.NguoiSuDungThietBi
     public class NguoiSuDungThietBiBusiness : INguoiSuDungThietBiBusiness
     {
         private readonly QlThietBiContext context;
+        private readonly IAuthenInfo authenInfo;
 
-        public NguoiSuDungThietBiBusiness(QlThietBiContext context)
+        public NguoiSuDungThietBiBusiness(QlThietBiContext context, IAuthenInfo authenInfo)
         {
             this.context = context;
+            this.authenInfo = authenInfo;
         }
 
         public async Task<IEnumerable<NguoiSuDungThietBiDto>> GetUsersAsync()
@@ -61,6 +64,7 @@ namespace QlThietBi.Businesses.NguoiSuDungThietBi
 
         public async Task<NguoiSuDungThietBiDto> SaveUserAsync(CreateUpdateNguoiSuDungThietBiRequest request)
         {
+            var user = GetCurrentUser();
             global::QlThietBi.Models.NguoiSuDungThietBi entity;
             if (request.Id.HasValue)
             {
@@ -74,6 +78,8 @@ namespace QlThietBi.Businesses.NguoiSuDungThietBi
                 entity.GhiChu = request.GhiChu;
                 entity.IsActive = request.IsActive;
                 entity.NgayChinhSuaCuoiCung = DateTime.UtcNow;
+                entity.MaNguoiChinhSua = user.MaNguoiDung;
+                entity.TenNguoiChinhSua = user.TenNguoiDung;
             }
             else
             {
@@ -87,7 +93,9 @@ namespace QlThietBi.Businesses.NguoiSuDungThietBi
                     Email = request.Email,
                     GhiChu = request.GhiChu,
                     IsActive = request.IsActive,
-                    NgayKhoiTao = DateTime.UtcNow
+                    NgayKhoiTao = DateTime.UtcNow,
+                    MaNguoiNhap = user.MaNguoiDung,
+                    TenNguoiNhap = user.TenNguoiDung
                 };
                 context.NguoiSuDungThietBis.Add(entity);
             }
@@ -110,6 +118,7 @@ namespace QlThietBi.Businesses.NguoiSuDungThietBi
 
         public async Task<bool> DeleteUserAsync(int id)
         {
+            var user = GetCurrentUser();
             var entity = await context.NguoiSuDungThietBis.FindAsync(id);
             if (entity == null)
             {
@@ -118,8 +127,15 @@ namespace QlThietBi.Businesses.NguoiSuDungThietBi
 
             entity.IsActive = false;
             entity.NgayChinhSuaCuoiCung = DateTime.UtcNow;
+            entity.MaNguoiChinhSua = user.MaNguoiDung;
+            entity.TenNguoiChinhSua = user.TenNguoiDung;
             await context.SaveChangesAsync();
             return true;
+        }
+
+        private LoggedInUser GetCurrentUser()
+        {
+            return authenInfo.Get() ?? throw new UnauthorizedAccessException("Chưa đăng nhập hoặc token không hợp lệ.");
         }
     }
 }

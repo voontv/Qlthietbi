@@ -1,5 +1,6 @@
 using QlThietBi.AutoConfig;
 using Microsoft.IdentityModel.Tokens;
+using QlThietBi.Models;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,6 +13,7 @@ namespace QlThietBi.Providers
     public interface ITokenGenerator
     {
         TokenResponse GenerateToken(string username);
+        TokenResponse GenerateToken(LoggedInUser user);
     }
 
     public class TokenGenerator : ITokenGenerator
@@ -35,25 +37,46 @@ namespace QlThietBi.Providers
 
         public TokenResponse GenerateToken(string username)
         {
+            return GenerateToken(new LoggedInUser
+            {
+                MaNguoiDung = username,
+                TenNguoiDung = username
+            });
+        }
+
+        public TokenResponse GenerateToken(LoggedInUser user)
+        {
             var claims = new List<Claim>
             {
-                CreateClaim(ClaimTypes.NameIdentifier, username),
-                CreateClaim(ClaimTypes.Name, username)
+                CreateClaim(ClaimTypes.NameIdentifier, user.MaNguoiDung),
+                CreateClaim(ClaimTypes.Name, user.TenNguoiDung),
+                CreateClaim("ma_nguoi_dung", user.MaNguoiDung),
+                CreateClaim("ten_nguoi_dung", user.TenNguoiDung)
             };
+            if (user.NguoiSuDungId.HasValue)
+            {
+                claims.Add(CreateClaim("nguoi_su_dung_id", user.NguoiSuDungId.Value.ToString()));
+            }
 
             var identity = new ClaimsIdentity(claims, "Bearer");
-
             var now = DateTime.UtcNow;
+            var expiresAt = now.AddSeconds(securitySettings.Expiration);
 
             var jwt = new JwtSecurityToken(
                 claims: identity.Claims,
                 notBefore: now,
-                expires: now.AddSeconds(securitySettings.Expiration),
+                expires: expiresAt,
                 signingCredentials: SigningCredentials);
 
             var token = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-            return new TokenResponse(token);
+            return new TokenResponse(token)
+            {
+                ExpiresAt = expiresAt,
+                NguoiSuDungId = user.NguoiSuDungId,
+                MaNguoiDung = user.MaNguoiDung,
+                TenNguoiDung = user.TenNguoiDung
+            };
         }
     }
 }

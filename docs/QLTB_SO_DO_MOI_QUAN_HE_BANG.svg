@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="980" viewBox="0 0 1400 980">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#455A64" />
+    </marker>
+    <style>
+      .title { font: 700 30px Arial, sans-serif; fill: #1F2933; }
+      .subtitle { font: 400 17px Arial, sans-serif; fill: #52616B; }
+      .group-title { font: 700 17px Arial, sans-serif; fill: #1F2933; }
+      .box-title { font: 700 18px Arial, sans-serif; fill: #102A43; }
+      .box-text { font: 400 14px Arial, sans-serif; fill: #334E68; }
+      .field { font: 400 12px Consolas, monospace; fill: #243B53; }
+      .field-strong { font: 700 12px Consolas, monospace; fill: #102A43; }
+      .note { font: 400 13px Arial, sans-serif; fill: #52616B; }
+      .line { stroke: #455A64; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .line-soft { stroke: #90A4AE; stroke-width: 2; fill: none; stroke-dasharray: 7 6; marker-end: url(#arrow); }
+      .catalog { fill: #E0F2F1; stroke: #00897B; stroke-width: 2; rx: 8; }
+      .core { fill: #FFF3E0; stroke: #FB8C00; stroke-width: 2.5; rx: 8; }
+      .business { fill: #E8EAF6; stroke: #5E35B1; stroke-width: 2; rx: 8; }
+      .attach { fill: #FCE4EC; stroke: #D81B60; stroke-width: 2; rx: 8; }
+      .panel { fill: #F8FAFC; stroke: #CBD5E1; stroke-width: 1.5; rx: 10; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="980" fill="#FFFFFF" />
+
+  <text x="60" y="58" class="title">Sơ đồ quan hệ dữ liệu Quản lý thiết bị</text>
+  <text x="60" y="88" class="subtitle">Thiết kế mới tách từ hệ thống cũ: thiết bị là trung tâm, danh mục và nghiệp vụ tách riêng để dễ quản lý, thống kê và convert dữ liệu.</text>
+
+  <rect x="40" y="120" width="360" height="500" class="panel" />
+  <text x="65" y="150" class="group-title">Danh mục dùng chung</text>
+
+  <rect x="70" y="180" width="280" height="105" class="catalog" />
+  <text x="95" y="212" class="box-title">DmDungChung</text>
+  <text x="95" y="236" class="field-strong">PK: Id int identity</text>
+  <text x="95" y="254" class="field">Ma, NhomDanhMuc: mã danh mục</text>
+  <text x="95" y="272" class="field">Ten, GhiChu, IsActive</text>
+
+  <rect x="70" y="325" width="280" height="105" class="catalog" />
+  <text x="95" y="357" class="box-title">DonViBoPhan</text>
+  <text x="95" y="381" class="field-strong">PK: Id int identity</text>
+  <text x="95" y="399" class="field">FK: ParentId int -&gt; DonViBoPhan.Id</text>
+  <text x="95" y="417" class="field">MaDonVi, TenDonVi, LoaiDonVi</text>
+
+  <rect x="70" y="470" width="280" height="105" class="catalog" />
+  <text x="95" y="502" class="box-title">NguoiSuDungThietBi</text>
+  <text x="95" y="526" class="field-strong">PK: Id int identity</text>
+  <text x="95" y="544" class="field">FK: DonViBoPhanId int</text>
+  <text x="95" y="562" class="field">MaNguoiDung, TenNguoiDung</text>
+
+  <rect x="1010" y="120" width="350" height="500" class="panel" />
+  <text x="1035" y="150" class="group-title">Nhóm và thông số động</text>
+
+  <rect x="1045" y="180" width="280" height="120" class="catalog" />
+  <text x="1070" y="212" class="box-title">NhomThietBi</text>
+  <text x="1070" y="236" class="field-strong">PK: Id int identity</text>
+  <text x="1070" y="254" class="field">FK: ParentId int -&gt; NhomThietBi.Id</text>
+  <text x="1070" y="272" class="field">MaNhomThietBi: mã đối chiếu</text>
+  <text x="1070" y="290" class="field">TenNhomThietBi, KyHieu</text>
+
+  <rect x="1045" y="350" width="280" height="105" class="catalog" />
+  <text x="1070" y="382" class="box-title">DmThongSoThietBi</text>
+  <text x="1070" y="406" class="field-strong">PK: Id int identity</text>
+  <text x="1070" y="424" class="field">FK: NhomThietBiId int</text>
+  <text x="1070" y="442" class="field">MaThongSo, KieuDuLieu</text>
+
+  <rect x="1045" y="500" width="280" height="90" class="catalog" />
+  <text x="1070" y="532" class="box-title">ThietBiThongSo</text>
+  <text x="1070" y="556" class="field-strong">PK: Id int identity</text>
+  <text x="1070" y="574" class="field">FK: ThietBiId int, ThongSoId int</text>
+
+  <rect x="470" y="245" width="470" height="230" class="core" />
+  <text x="635" y="290" class="box-title">ThietBi</text>
+  <text x="515" y="320" class="field-strong">PK: Id int identity | MaThietBi | Doi chieu cu: MaThietBiCu</text>
+  <text x="515" y="342" class="field">FK int: NhomThietBiId, TrangThaiId, PhongBanId, BoPhanId, NguoiSuDungId</text>
+  <text x="515" y="364" class="field">Danh muc phu: TrangThaiKiemKeId, DonViTinhId, NhanHieuId, MauSacId</text>
+  <text x="515" y="386" class="field">Danh muc phu: NuocSanXuatId, ChatLieuId, DonViCungCapId</text>
+  <text x="515" y="408" class="field">Thong tin chinh: TenThietBi, SoSerial, Model, NguyenGia, NgayNhapThietBi</text>
+  <text x="515" y="440" class="note">FE tìm kiếm/thống kê từ bảng này, rồi map tên qua danh mục, đơn vị và người dùng.</text>
+
+  <rect x="70" y="700" width="280" height="105" class="business" />
+  <text x="95" y="732" class="box-title">PhieuThietBi</text>
+  <text x="95" y="756" class="field-strong">PK: Id int identity | FK: ThietBiId int</text>
+  <text x="95" y="774" class="field">SoPhieu, LoaiPhieu, NgayPhieu</text>
+  <text x="95" y="792" class="field">PhongBanId, BoPhanId, NguoiSuDungId</text>
+
+  <rect x="415" y="700" width="280" height="105" class="business" />
+  <text x="440" y="732" class="box-title">PhieuThietBiChiTiet</text>
+  <text x="440" y="756" class="field-strong">PK: Id int identity | FK: PhieuThietBiId int</text>
+  <text x="440" y="774" class="field">CongViecId, ThongSoId</text>
+  <text x="440" y="792" class="field">NoiDung, GiaTri, ChiPhi</text>
+
+  <rect x="760" y="700" width="280" height="105" class="business" />
+  <text x="785" y="732" class="box-title">LichSuThietBi</text>
+  <text x="785" y="756" class="field-strong">PK: Id int identity | FK: ThietBiId int</text>
+  <text x="785" y="774" class="field">LoaiNghiepVu, NghiepVuId</text>
+  <text x="785" y="792" class="field">TrangThai/PhongBan/BoPhan/Nguoi: Truoc-Sau</text>
+
+  <rect x="1105" y="700" width="220" height="105" class="attach" />
+  <text x="1130" y="732" class="box-title">TepDinhKem</text>
+  <text x="1130" y="756" class="field-strong">PK: Id int identity</text>
+  <text x="1130" y="774" class="field">DoiTuongLoai</text>
+  <text x="1130" y="792" class="field">DoiTuongId, DuongDan</text>
+
+  <path d="M350 230 C420 230, 420 315, 470 315" class="line" />
+  <path d="M350 375 C420 375, 420 355, 470 355" class="line" />
+  <path d="M350 522 C425 522, 425 395, 470 395" class="line" />
+
+  <path d="M1045 240 C975 240, 970 300, 940 320" class="line" />
+  <path d="M1045 402 C980 402, 970 385, 940 375" class="line" />
+  <path d="M940 430 C1010 455, 1010 535, 1045 545" class="line" />
+
+  <path d="M705 475 C705 590, 210 590, 210 700" class="line" />
+  <path d="M350 752 L415 752" class="line" />
+  <path d="M735 475 C735 590, 900 590, 900 700" class="line" />
+  <path d="M940 410 C1110 490, 1215 610, 1215 700" class="line-soft" />
+
+  <path d="M1045 545 C970 545, 955 500, 850 475" class="line" />
+  <path d="M760 752 C675 750, 650 805, 555 805" class="line-soft" />
+
+  <rect x="60" y="875" width="1280" height="65" fill="#F1F5F9" stroke="#CBD5E1" rx="8" />
+  <text x="85" y="903" class="note">Ghi chú: đường liền là quan hệ chính. Đường nét đứt là quan hệ dùng chung/logic, ví dụ file đính kèm hoặc chi tiết phiếu có thể trỏ tới nhiều loại dữ liệu.</text>
+  <text x="85" y="928" class="note">Dữ liệu cũ được giữ mã nghiệp vụ để đối chiếu, còn hệ thống mới dùng Id int identity nội bộ để join và xử lý nhanh hơn.</text>
+</svg>

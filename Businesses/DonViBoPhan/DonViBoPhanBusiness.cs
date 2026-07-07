@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using QlThietBi.Businesses;
 using QlThietBi.DTO.Request;
 using QlThietBi.DTO.Response;
 using QlThietBi.Models;
@@ -12,10 +13,12 @@ namespace QlThietBi.Businesses.DonViBoPhan
     public class DonViBoPhanBusiness : IDonViBoPhanBusiness
     {
         private readonly QlThietBiContext context;
+        private readonly IAuthenInfo authenInfo;
 
-        public DonViBoPhanBusiness(QlThietBiContext context)
+        public DonViBoPhanBusiness(QlThietBiContext context, IAuthenInfo authenInfo)
         {
             this.context = context;
+            this.authenInfo = authenInfo;
         }
 
         public async Task<IEnumerable<DonViBoPhanDto>> GetUnitsAsync()
@@ -59,6 +62,7 @@ namespace QlThietBi.Businesses.DonViBoPhan
 
         public async Task<DonViBoPhanDto> SaveUnitAsync(CreateUpdateDonViBoPhanRequest request)
         {
+            var user = GetCurrentUser();
             global::QlThietBi.Models.DonViBoPhan entity;
             if (request.Id.HasValue)
             {
@@ -71,6 +75,8 @@ namespace QlThietBi.Businesses.DonViBoPhan
                 entity.SapXep = request.SapXep;
                 entity.IsActive = request.IsActive;
                 entity.NgayChinhSuaCuoiCung = DateTime.UtcNow;
+                entity.MaNguoiChinhSua = user.MaNguoiDung;
+                entity.TenNguoiChinhSua = user.TenNguoiDung;
             }
             else
             {
@@ -83,7 +89,9 @@ namespace QlThietBi.Businesses.DonViBoPhan
                     GhiChu = request.GhiChu,
                     SapXep = request.SapXep,
                     IsActive = request.IsActive,
-                    NgayKhoiTao = DateTime.UtcNow
+                    NgayKhoiTao = DateTime.UtcNow,
+                    MaNguoiNhap = user.MaNguoiDung,
+                    TenNguoiNhap = user.TenNguoiDung
                 };
                 context.DonViBoPhans.Add(entity);
             }
@@ -105,6 +113,7 @@ namespace QlThietBi.Businesses.DonViBoPhan
 
         public async Task<bool> DeleteUnitAsync(int id)
         {
+            var user = GetCurrentUser();
             var entity = await context.DonViBoPhans.FindAsync(id);
             if (entity == null)
             {
@@ -113,8 +122,15 @@ namespace QlThietBi.Businesses.DonViBoPhan
 
             entity.IsActive = false;
             entity.NgayChinhSuaCuoiCung = DateTime.UtcNow;
+            entity.MaNguoiChinhSua = user.MaNguoiDung;
+            entity.TenNguoiChinhSua = user.TenNguoiDung;
             await context.SaveChangesAsync();
             return true;
+        }
+
+        private LoggedInUser GetCurrentUser()
+        {
+            return authenInfo.Get() ?? throw new UnauthorizedAccessException("Chưa đăng nhập hoặc token không hợp lệ.");
         }
     }
 }

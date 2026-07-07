@@ -5,7 +5,7 @@ namespace QlThietBi.DTO.Request
     public class CreateUpdateDmDungChungRequest
     {
         public int? Id { get; set; }
-        public string NhomDanhMuc { get; set; } = null!;
+        public string? NhomDanhMuc { get; set; }
         public string Ma { get; set; } = null!;
         public string Ten { get; set; } = null!;
         public string? GhiChu { get; set; }

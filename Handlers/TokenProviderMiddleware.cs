@@ -1,12 +1,8 @@
-using QlThietBi.Models;
-using QlThietBi.Providers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
-using System;
+using QlThietBi.Models;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using Task = System.Threading.Tasks.Task;
 
 namespace QlThietBi.Handlers
 {
@@ -22,13 +18,50 @@ namespace QlThietBi.Handlers
         public async Task Invoke(HttpContext context)
         {
             var authenticateInfo = await context.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
-            var bearerTokenIdentity = authenticateInfo?.Principal;
-            if (bearerTokenIdentity?.Identity is ClaimsIdentity identity)
+            if (authenticateInfo?.Principal?.Identity is ClaimsIdentity identity)
             {
                 context.User = new UserClaimsPrincipal(identity);
             }
+            else
+            {
+                var fallbackIdentity = TryReadExternalBearerToken(context);
+                if (fallbackIdentity != null)
+                {
+                    context.User = new UserClaimsPrincipal(fallbackIdentity);
+                }
+            }
 
             await next(context);
+        }
+
+        private static ClaimsIdentity? TryReadExternalBearerToken(HttpContext context)
+        {
+            var authorization = context.Request.Headers.Authorization.FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(authorization) || !authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            var token = authorization["Bearer ".Length..].Trim();
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return null;
+            }
+
+            try
+            {
+                var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
+                if (jwt.ValidTo != DateTime.MinValue && jwt.ValidTo <= DateTime.UtcNow)
+                {
+                    return null;
+                }
+
+                return new ClaimsIdentity(jwt.Claims, JwtBearerDefaults.AuthenticationScheme);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

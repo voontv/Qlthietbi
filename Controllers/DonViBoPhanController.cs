@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QlThietBi.Businesses.DonViBoPhan;
 using QlThietBi.DTO.Request;
@@ -67,6 +68,7 @@ namespace QlThietBi.Controllers
         /// }
         /// </remarks>
         /// <response code="200">Đơn vị / bộ phận đã được lưu.</response>
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(DonViBoPhanDto), 200)]
         public async Task<ActionResult<DonViBoPhanDto>> SaveUnit(CreateUpdateDonViBoPhanRequest request)
@@ -80,6 +82,7 @@ namespace QlThietBi.Controllers
         /// </summary>
         /// <response code="204">Xóa thành công.</response>
         /// <response code="404">Không tìm thấy đơn vị / bộ phận.</response>
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]

@@ -1,6 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using QlThietBi.AutoConfig;
 using QlThietBi.Models;
-
 
 namespace QlThietBi.Businesses
 {
@@ -9,26 +9,39 @@ namespace QlThietBi.Businesses
     {
         LoggedInUser? Get();
     }
-    public class AuthenInfo: IAuthenInfo
+
+    public class AuthenInfo : IAuthenInfo
     {
         private readonly IHttpContextAccessor context;
+        private readonly QlThietBiContext dbContext;
 
-        public AuthenInfo(IHttpContextAccessor context)
+        public AuthenInfo(IHttpContextAccessor context, QlThietBiContext dbContext)
         {
             this.context = context;
+            this.dbContext = dbContext;
         }
 
         public LoggedInUser? Get()
         {
-            if (context.HttpContext?.User is UserClaimsPrincipal user)
+            if (context.HttpContext?.User is not UserClaimsPrincipal user || string.IsNullOrWhiteSpace(user.MaNguoiDung))
             {
-                return new LoggedInUser
-                {
-                    Username = user.Username,
-                };
+                return null;
             }
 
-            return null;
+            var dbUser = dbContext.NguoiSuDungThietBis
+                .AsNoTracking()
+                .FirstOrDefault(x => x.IsActive && x.MaNguoiDung == user.MaNguoiDung);
+            if (dbUser == null)
+            {
+                return null;
+            }
+
+            return new LoggedInUser
+            {
+                NguoiSuDungId = dbUser.Id,
+                MaNguoiDung = dbUser.MaNguoiDung,
+                TenNguoiDung = dbUser.TenNguoiDung
+            };
         }
     }
 }

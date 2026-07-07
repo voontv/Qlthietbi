@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QlThietBi.Businesses.ThietBi;
 using QlThietBi.DTO.Request;
@@ -13,6 +14,16 @@ namespace QlThietBi.Controllers
     public class ThietBiController : ControllerBase
     {
         private readonly IThietBiBusiness thietBiBusiness;
+        private const string TrangThaiThietBi = "TRANG_THAI_TB";
+        private const string TrangThaiKiemKe = "TRANG_THAI_KK";
+        private const string DonViTinh = "DON_VI_TINH";
+        private const string NhanHieu = "NHAN_HIEU";
+        private const string MauSac = "MAU_SAC";
+        private const string NuocSanXuat = "NUOC_SAN_XUAT";
+        private const string ChatLieu = "CHAT_LIEU";
+        private const string DonViCungCap = "DON_VI_CUNG_CAP";
+        private const string KetLuan = "KET_LUAN";
+        private const string CongViecBtbd = "CONG_VIEC_BTBD";
 
         public ThietBiController(IThietBiBusiness thietBiBusiness)
         {
@@ -28,8 +39,77 @@ namespace QlThietBi.Controllers
         [ProducesResponseType(typeof(IEnumerable<DmDungChungDto>), 200)]
         public async Task<ActionResult<IEnumerable<DmDungChungDto>>> LayDanhMucDungChung(string nhomDanhMuc)
         {
-            var result = await thietBiBusiness.LayDanhMucDungChungAsync(nhomDanhMuc);
-            return Ok(result);
+            return await LayDanhMucTheoNhom(ChuanHoaNhomDanhMuc(nhomDanhMuc));
+        }
+
+        [HttpGet("danh-muc/trang-thai-thiet-bi")]
+        [ProducesResponseType(typeof(IEnumerable<DmDungChungDto>), 200)]
+        public Task<ActionResult<IEnumerable<DmDungChungDto>>> LayDanhMucTrangThaiThietBi()
+        {
+            return LayDanhMucTheoNhom(TrangThaiThietBi);
+        }
+
+        [HttpGet("danh-muc/trang-thai-kiem-ke")]
+        [ProducesResponseType(typeof(IEnumerable<DmDungChungDto>), 200)]
+        public Task<ActionResult<IEnumerable<DmDungChungDto>>> LayDanhMucTrangThaiKiemKe()
+        {
+            return LayDanhMucTheoNhom(TrangThaiKiemKe);
+        }
+
+        [HttpGet("danh-muc/don-vi-tinh")]
+        [ProducesResponseType(typeof(IEnumerable<DmDungChungDto>), 200)]
+        public Task<ActionResult<IEnumerable<DmDungChungDto>>> LayDanhMucDonViTinh()
+        {
+            return LayDanhMucTheoNhom(DonViTinh);
+        }
+
+        [HttpGet("danh-muc/nhan-hieu")]
+        [ProducesResponseType(typeof(IEnumerable<DmDungChungDto>), 200)]
+        public Task<ActionResult<IEnumerable<DmDungChungDto>>> LayDanhMucNhanHieu()
+        {
+            return LayDanhMucTheoNhom(NhanHieu);
+        }
+
+        [HttpGet("danh-muc/mau-sac")]
+        [ProducesResponseType(typeof(IEnumerable<DmDungChungDto>), 200)]
+        public Task<ActionResult<IEnumerable<DmDungChungDto>>> LayDanhMucMauSac()
+        {
+            return LayDanhMucTheoNhom(MauSac);
+        }
+
+        [HttpGet("danh-muc/nuoc-san-xuat")]
+        [ProducesResponseType(typeof(IEnumerable<DmDungChungDto>), 200)]
+        public Task<ActionResult<IEnumerable<DmDungChungDto>>> LayDanhMucNuocSanXuat()
+        {
+            return LayDanhMucTheoNhom(NuocSanXuat);
+        }
+
+        [HttpGet("danh-muc/chat-lieu")]
+        [ProducesResponseType(typeof(IEnumerable<DmDungChungDto>), 200)]
+        public Task<ActionResult<IEnumerable<DmDungChungDto>>> LayDanhMucChatLieu()
+        {
+            return LayDanhMucTheoNhom(ChatLieu);
+        }
+
+        [HttpGet("danh-muc/don-vi-cung-cap")]
+        [ProducesResponseType(typeof(IEnumerable<DmDungChungDto>), 200)]
+        public Task<ActionResult<IEnumerable<DmDungChungDto>>> LayDanhMucDonViCungCap()
+        {
+            return LayDanhMucTheoNhom(DonViCungCap);
+        }
+
+        [HttpGet("danh-muc/ket-luan")]
+        [ProducesResponseType(typeof(IEnumerable<DmDungChungDto>), 200)]
+        public Task<ActionResult<IEnumerable<DmDungChungDto>>> LayDanhMucKetLuan()
+        {
+            return LayDanhMucTheoNhom(KetLuan);
+        }
+
+        [HttpGet("danh-muc/cong-viec-btbd")]
+        [ProducesResponseType(typeof(IEnumerable<DmDungChungDto>), 200)]
+        public Task<ActionResult<IEnumerable<DmDungChungDto>>> LayDanhMucCongViecBtbd()
+        {
+            return LayDanhMucTheoNhom(CongViecBtbd);
         }
 
         /// <summary>
@@ -48,11 +128,95 @@ namespace QlThietBi.Controllers
         /// }
         /// </remarks>
         /// <response code="200">Danh mục dùng chung được lưu.</response>
+        [Authorize]
         [HttpPost("danh-muc")]
         public async Task<ActionResult<DmDungChungDto>> LuuDanhMucDungChung(CreateUpdateDmDungChungRequest request)
         {
+            if (string.IsNullOrWhiteSpace(request.NhomDanhMuc))
+            {
+                return BadRequest("Thiếu nhóm danh mục.");
+            }
+
+            request.NhomDanhMuc = ChuanHoaNhomDanhMuc(request.NhomDanhMuc);
             var result = await thietBiBusiness.LuuDanhMucDungChungAsync(request);
             return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPost("danh-muc/{nhomDanhMuc}")]
+        public Task<ActionResult<DmDungChungDto>> LuuDanhMucDungChungTheoNhom(string nhomDanhMuc, CreateUpdateDmDungChungRequest request)
+        {
+            return LuuDanhMucTheoNhom(ChuanHoaNhomDanhMuc(nhomDanhMuc), request);
+        }
+
+        [Authorize]
+        [HttpPost("danh-muc/trang-thai-thiet-bi")]
+        public Task<ActionResult<DmDungChungDto>> LuuDanhMucTrangThaiThietBi(CreateUpdateDmDungChungRequest request)
+        {
+            return LuuDanhMucTheoNhom(TrangThaiThietBi, request);
+        }
+
+        [Authorize]
+        [HttpPost("danh-muc/trang-thai-kiem-ke")]
+        public Task<ActionResult<DmDungChungDto>> LuuDanhMucTrangThaiKiemKe(CreateUpdateDmDungChungRequest request)
+        {
+            return LuuDanhMucTheoNhom(TrangThaiKiemKe, request);
+        }
+
+        [Authorize]
+        [HttpPost("danh-muc/don-vi-tinh")]
+        public Task<ActionResult<DmDungChungDto>> LuuDanhMucDonViTinh(CreateUpdateDmDungChungRequest request)
+        {
+            return LuuDanhMucTheoNhom(DonViTinh, request);
+        }
+
+        [Authorize]
+        [HttpPost("danh-muc/nhan-hieu")]
+        public Task<ActionResult<DmDungChungDto>> LuuDanhMucNhanHieu(CreateUpdateDmDungChungRequest request)
+        {
+            return LuuDanhMucTheoNhom(NhanHieu, request);
+        }
+
+        [Authorize]
+        [HttpPost("danh-muc/mau-sac")]
+        public Task<ActionResult<DmDungChungDto>> LuuDanhMucMauSac(CreateUpdateDmDungChungRequest request)
+        {
+            return LuuDanhMucTheoNhom(MauSac, request);
+        }
+
+        [Authorize]
+        [HttpPost("danh-muc/nuoc-san-xuat")]
+        public Task<ActionResult<DmDungChungDto>> LuuDanhMucNuocSanXuat(CreateUpdateDmDungChungRequest request)
+        {
+            return LuuDanhMucTheoNhom(NuocSanXuat, request);
+        }
+
+        [Authorize]
+        [HttpPost("danh-muc/chat-lieu")]
+        public Task<ActionResult<DmDungChungDto>> LuuDanhMucChatLieu(CreateUpdateDmDungChungRequest request)
+        {
+            return LuuDanhMucTheoNhom(ChatLieu, request);
+        }
+
+        [Authorize]
+        [HttpPost("danh-muc/don-vi-cung-cap")]
+        public Task<ActionResult<DmDungChungDto>> LuuDanhMucDonViCungCap(CreateUpdateDmDungChungRequest request)
+        {
+            return LuuDanhMucTheoNhom(DonViCungCap, request);
+        }
+
+        [Authorize]
+        [HttpPost("danh-muc/ket-luan")]
+        public Task<ActionResult<DmDungChungDto>> LuuDanhMucKetLuan(CreateUpdateDmDungChungRequest request)
+        {
+            return LuuDanhMucTheoNhom(KetLuan, request);
+        }
+
+        [Authorize]
+        [HttpPost("danh-muc/cong-viec-btbd")]
+        public Task<ActionResult<DmDungChungDto>> LuuDanhMucCongViecBtbd(CreateUpdateDmDungChungRequest request)
+        {
+            return LuuDanhMucTheoNhom(CongViecBtbd, request);
         }
 
         /// <summary>
@@ -61,6 +225,7 @@ namespace QlThietBi.Controllers
         /// <param name="id">Id danh mục dùng chung.</param>
         /// <response code="204">Xóa thành công.</response>
         /// <response code="404">Không tìm thấy danh mục.</response>
+        [Authorize]
         [HttpDelete("danh-muc/{id}")]
         public async Task<ActionResult> XoaDanhMucDungChung(int id)
         {
@@ -98,6 +263,7 @@ namespace QlThietBi.Controllers
         /// }
         /// </remarks>
         /// <response code="200">Nhóm thiết bị được lưu.</response>
+        [Authorize]
         [HttpPost("nhom-thiet-bi")]
         public async Task<ActionResult<NhomThietBiDto>> LuuNhomThietBi(CreateUpdateNhomThietBiRequest request)
         {
@@ -111,6 +277,7 @@ namespace QlThietBi.Controllers
         /// <param name="id">Id nhóm thiết bị.</param>
         /// <response code="204">Xóa thành công.</response>
         /// <response code="404">Không tìm thấy nhóm thiết bị.</response>
+        [Authorize]
         [HttpDelete("nhom-thiet-bi/{id}")]
         public async Task<ActionResult> XoaNhomThietBi(int id)
         {
@@ -173,6 +340,7 @@ namespace QlThietBi.Controllers
         /// Request mẫu: xem DTO `CreateUpdateThietBiRequest`.
         /// </remarks>
         /// <response code="200">Thiết bị được lưu.</response>
+        [Authorize]
         [HttpPost("thiet-bi")]
         public async Task<ActionResult<ThietBiDto>> LuuThietBi(CreateUpdateThietBiRequest request)
         {
@@ -186,6 +354,7 @@ namespace QlThietBi.Controllers
         /// <param name="id">Id thiết bị.</param>
         /// <response code="204">Xóa thành công.</response>
         /// <response code="404">Không tìm thấy thiết bị.</response>
+        [Authorize]
         [HttpDelete("thiet-bi/{id}")]
         public async Task<ActionResult> XoaThietBi(int id)
         {
@@ -226,6 +395,7 @@ namespace QlThietBi.Controllers
         /// }
         /// </remarks>
         /// <response code="200">Thông số thiết bị được lưu.</response>
+        [Authorize]
         [HttpPost("thiet-bi/thong-so")]
         public async Task<ActionResult<DmThongSoThietBiDto>> LuuThongSoThietBi(CreateUpdateDmThongSoThietBiRequest request)
         {
@@ -239,6 +409,7 @@ namespace QlThietBi.Controllers
         /// <param name="id">Id thông số thiết bị.</param>
         /// <response code="204">Xóa thành công.</response>
         /// <response code="404">Không tìm thấy thông số.</response>
+        [Authorize]
         [HttpDelete("thiet-bi/thong-so/{id}")]
         public async Task<ActionResult> XoaThongSoThietBi(int id)
         {
@@ -272,6 +443,7 @@ namespace QlThietBi.Controllers
         /// }
         /// </remarks>
         /// <response code="200">Phiếu nghiệp vụ thiết bị được lưu.</response>
+        [Authorize]
         [HttpPost("phieu-thiet-bi")]
         public async Task<ActionResult<PhieuThietBiDto>> TaoPhieuThietBi(CreatePhieuThietBiRequest request)
         {
@@ -289,6 +461,37 @@ namespace QlThietBi.Controllers
         {
             var result = await thietBiBusiness.LayLichSuThietBiAsync(thietBiId);
             return Ok(result);
+        }
+
+        private async Task<ActionResult<IEnumerable<DmDungChungDto>>> LayDanhMucTheoNhom(string nhomDanhMuc)
+        {
+            var result = await thietBiBusiness.LayDanhMucDungChungAsync(nhomDanhMuc);
+            return Ok(result);
+        }
+
+        private async Task<ActionResult<DmDungChungDto>> LuuDanhMucTheoNhom(string nhomDanhMuc, CreateUpdateDmDungChungRequest request)
+        {
+            request.NhomDanhMuc = nhomDanhMuc;
+            var result = await thietBiBusiness.LuuDanhMucDungChungAsync(request);
+            return Ok(result);
+        }
+
+        private static string ChuanHoaNhomDanhMuc(string nhomDanhMuc)
+        {
+            return nhomDanhMuc.Trim().ToUpperInvariant() switch
+            {
+                "TRANG-THAI-THIET-BI" => TrangThaiThietBi,
+                "TRANG-THAI-KIEM-KE" => TrangThaiKiemKe,
+                "DON-VI-TINH" => DonViTinh,
+                "NHAN-HIEU" => NhanHieu,
+                "MAU-SAC" => MauSac,
+                "NUOC-SAN-XUAT" => NuocSanXuat,
+                "CHAT-LIEU" => ChatLieu,
+                "DON-VI-CUNG-CAP" => DonViCungCap,
+                "KET-LUAN" => KetLuan,
+                "CONG-VIEC-BTBD" => CongViecBtbd,
+                var value => value
+            };
         }
     }
 }

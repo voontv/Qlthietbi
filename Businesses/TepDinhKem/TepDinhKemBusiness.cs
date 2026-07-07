@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using QlThietBi.Businesses;
 using QlThietBi.DTO.Request;
 using QlThietBi.DTO.Response;
 using QlThietBi.Models;
@@ -12,10 +13,12 @@ namespace QlThietBi.Businesses.TepDinhKem
     public class TepDinhKemBusiness : ITepDinhKemBusiness
     {
         private readonly QlThietBiContext context;
+        private readonly IAuthenInfo authenInfo;
 
-        public TepDinhKemBusiness(QlThietBiContext context)
+        public TepDinhKemBusiness(QlThietBiContext context, IAuthenInfo authenInfo)
         {
             this.context = context;
+            this.authenInfo = authenInfo;
         }
 
         public async Task<IEnumerable<TepDinhKemDto>> GetAttachmentsAsync(string doiTuongLoai, int doiTuongId)
@@ -59,6 +62,7 @@ namespace QlThietBi.Businesses.TepDinhKem
 
         public async Task<TepDinhKemDto> SaveAttachmentAsync(CreateUpdateTepDinhKemRequest request)
         {
+            var user = GetCurrentUser();
             global::QlThietBi.Models.TepDinhKem entity;
             if (request.Id.HasValue)
             {
@@ -82,7 +86,9 @@ namespace QlThietBi.Businesses.TepDinhKem
                     LoaiFile = request.LoaiFile,
                     DungLuong = request.DungLuong,
                     GhiChu = request.GhiChu,
-                    NgayKhoiTao = DateTime.UtcNow
+                    NgayKhoiTao = DateTime.UtcNow,
+                    MaNguoiNhap = user.MaNguoiDung,
+                    TenNguoiNhap = user.TenNguoiDung
                 };
                 context.TepDinhKems.Add(entity);
             }
@@ -104,6 +110,7 @@ namespace QlThietBi.Businesses.TepDinhKem
 
         public async Task<bool> DeleteAttachmentAsync(int id)
         {
+            _ = GetCurrentUser();
             var entity = await context.TepDinhKems.FindAsync(id);
             if (entity == null)
             {
@@ -113,6 +120,11 @@ namespace QlThietBi.Businesses.TepDinhKem
             context.TepDinhKems.Remove(entity);
             await context.SaveChangesAsync();
             return true;
+        }
+
+        private LoggedInUser GetCurrentUser()
+        {
+            return authenInfo.Get() ?? throw new UnauthorizedAccessException("Chưa đăng nhập hoặc token không hợp lệ.");
         }
     }
 }

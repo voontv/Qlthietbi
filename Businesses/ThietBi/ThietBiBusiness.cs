@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using QlThietBi.Businesses;
 using QlThietBi.AutoConfig;
 using QlThietBi.DTO.Request;
 using QlThietBi.DTO.Response;
@@ -16,10 +17,12 @@ namespace QlThietBi.Businesses.ThietBi
     public class ThietBiBusiness : IThietBiBusiness
     {
         private readonly QlThietBiContext context;
+        private readonly IAuthenInfo authenInfo;
 
-        public ThietBiBusiness(QlThietBiContext context)
+        public ThietBiBusiness(QlThietBiContext context, IAuthenInfo authenInfo)
         {
             this.context = context;
+            this.authenInfo = authenInfo;
         }
 
         public async Task<IEnumerable<DmDungChungDto>> LayDanhMucDungChungAsync(string nhomDanhMuc)
@@ -43,6 +46,16 @@ namespace QlThietBi.Businesses.ThietBi
 
         public async Task<DmDungChungDto> LuuDanhMucDungChungAsync(CreateUpdateDmDungChungRequest request)
         {
+            var user = GetCurrentUser();
+            if (string.IsNullOrWhiteSpace(request.NhomDanhMuc))
+            {
+                throw new InvalidOperationException("Thiếu nhóm danh mục.");
+            }
+
+            request.NhomDanhMuc = request.NhomDanhMuc.Trim().ToUpperInvariant();
+            request.Ma = request.Ma.Trim();
+            request.Ten = request.Ten.Trim();
+
             var duplicate = await context.DmDungChungs
                 .AnyAsync(x => x.NhomDanhMuc == request.NhomDanhMuc && x.Ma == request.Ma && x.Id != request.Id);
 
@@ -63,6 +76,8 @@ namespace QlThietBi.Businesses.ThietBi
                 entity.SapXep = request.SapXep;
                 entity.IsActive = request.IsActive;
                 entity.NgayChinhSuaCuoiCung = DateTime.UtcNow;
+                entity.MaNguoiChinhSua = user.MaNguoiDung;
+                entity.TenNguoiChinhSua = user.TenNguoiDung;
             }
             else
             {
@@ -74,7 +89,9 @@ namespace QlThietBi.Businesses.ThietBi
                     GhiChu = request.GhiChu,
                     SapXep = request.SapXep,
                     IsActive = request.IsActive,
-                    NgayKhoiTao = DateTime.UtcNow
+                    NgayKhoiTao = DateTime.UtcNow,
+                    MaNguoiNhap = user.MaNguoiDung,
+                    TenNguoiNhap = user.TenNguoiDung
                 };
                 context.DmDungChungs.Add(entity);
             }
@@ -95,6 +112,7 @@ namespace QlThietBi.Businesses.ThietBi
 
         public async Task<bool> XoaDanhMucDungChungAsync(int id)
         {
+            var user = GetCurrentUser();
             var entity = await context.DmDungChungs.FindAsync(id);
             if (entity == null)
             {
@@ -103,6 +121,8 @@ namespace QlThietBi.Businesses.ThietBi
 
             entity.IsActive = false;
             entity.NgayChinhSuaCuoiCung = DateTime.UtcNow;
+            entity.MaNguoiChinhSua = user.MaNguoiDung;
+            entity.TenNguoiChinhSua = user.TenNguoiDung;
             await context.SaveChangesAsync();
             return true;
         }
@@ -129,6 +149,7 @@ namespace QlThietBi.Businesses.ThietBi
 
         public async Task<NhomThietBiDto> LuuNhomThietBiAsync(CreateUpdateNhomThietBiRequest request)
         {
+            var user = GetCurrentUser();
             var duplicate = await context.NhomThietBis
                 .AnyAsync(x => x.MaNhomThietBi == request.MaNhomThietBi && x.Id != request.Id);
 
@@ -150,6 +171,8 @@ namespace QlThietBi.Businesses.ThietBi
                 entity.SapXep = request.SapXep;
                 entity.IsActive = request.IsActive;
                 entity.NgayChinhSuaCuoiCung = DateTime.UtcNow;
+                entity.MaNguoiChinhSua = user.MaNguoiDung;
+                entity.TenNguoiChinhSua = user.TenNguoiDung;
             }
             else
             {
@@ -162,7 +185,9 @@ namespace QlThietBi.Businesses.ThietBi
                     MoTa = request.MoTa,
                     SapXep = request.SapXep,
                     IsActive = request.IsActive,
-                    NgayKhoiTao = DateTime.UtcNow
+                    NgayKhoiTao = DateTime.UtcNow,
+                    MaNguoiNhap = user.MaNguoiDung,
+                    TenNguoiNhap = user.TenNguoiDung
                 };
                 context.NhomThietBis.Add(entity);
             }
@@ -184,6 +209,7 @@ namespace QlThietBi.Businesses.ThietBi
 
         public async Task<bool> XoaNhomThietBiAsync(int id)
         {
+            var user = GetCurrentUser();
             var entity = await context.NhomThietBis.FindAsync(id);
             if (entity == null)
             {
@@ -192,6 +218,8 @@ namespace QlThietBi.Businesses.ThietBi
 
             entity.IsActive = false;
             entity.NgayChinhSuaCuoiCung = DateTime.UtcNow;
+            entity.MaNguoiChinhSua = user.MaNguoiDung;
+            entity.TenNguoiChinhSua = user.TenNguoiDung;
             await context.SaveChangesAsync();
             return true;
         }
@@ -435,6 +463,7 @@ namespace QlThietBi.Businesses.ThietBi
 
         public async Task<ThietBiDto> LuuThietBiAsync(CreateUpdateThietBiRequest request)
         {
+            var user = GetCurrentUser();
             var duplicate = await context.ThietBis
                 .AnyAsync(x => x.MaThietBi == request.MaThietBi && x.Id != request.Id);
 
@@ -484,6 +513,8 @@ namespace QlThietBi.Businesses.ThietBi
                 entity.GhiChu = request.GhiChu;
                 entity.IsActive = request.IsActive;
                 entity.NgayChinhSuaCuoiCung = now;
+                entity.MaNguoiChinhSua = user.MaNguoiDung;
+                entity.TenNguoiChinhSua = user.TenNguoiDung;
 
                 if (originalTrangThaiId != request.TrangThaiId || originalPhongBanId != request.PhongBanId || originalBoPhanId != request.BoPhanId || originalNguoiSuDungId != request.NguoiSuDungId)
                 {
@@ -523,7 +554,9 @@ namespace QlThietBi.Businesses.ThietBi
                     ViTriLapDat = request.ViTriLapDat,
                     GhiChu = request.GhiChu,
                     IsActive = request.IsActive,
-                    NgayKhoiTao = now
+                    NgayKhoiTao = now,
+                    MaNguoiNhap = user.MaNguoiDung,
+                    TenNguoiNhap = user.TenNguoiDung
                 };
 
                 context.ThietBis.Add(entity);
@@ -598,6 +631,7 @@ namespace QlThietBi.Businesses.ThietBi
 
         public async Task<bool> XoaThietBiAsync(int id)
         {
+            var user = GetCurrentUser();
             var entity = await context.ThietBis.FindAsync(id);
             if (entity == null)
             {
@@ -606,6 +640,8 @@ namespace QlThietBi.Businesses.ThietBi
 
             entity.IsActive = false;
             entity.NgayChinhSuaCuoiCung = DateTime.UtcNow;
+            entity.MaNguoiChinhSua = user.MaNguoiDung;
+            entity.TenNguoiChinhSua = user.TenNguoiDung;
             await context.SaveChangesAsync();
             return true;
         }
@@ -633,6 +669,7 @@ namespace QlThietBi.Businesses.ThietBi
 
         public async Task<DmThongSoThietBiDto> LuuThongSoThietBiAsync(CreateUpdateDmThongSoThietBiRequest request)
         {
+            var user = GetCurrentUser();
             var duplicate = await context.DmThongSoThietBis
                 .AnyAsync(x => x.NhomThietBiId == request.NhomThietBiId && x.MaThongSo == request.MaThongSo && x.Id != request.Id);
 
@@ -655,6 +692,8 @@ namespace QlThietBi.Businesses.ThietBi
                 entity.IsActive = request.IsActive;
                 entity.GhiChu = request.GhiChu;
                 entity.NgayChinhSuaCuoiCung = DateTime.UtcNow;
+                entity.MaNguoiChinhSua = user.MaNguoiDung;
+                entity.TenNguoiChinhSua = user.TenNguoiDung;
             }
             else
             {
@@ -669,7 +708,9 @@ namespace QlThietBi.Businesses.ThietBi
                     SapXep = request.SapXep,
                     IsActive = request.IsActive,
                     GhiChu = request.GhiChu,
-                    NgayKhoiTao = DateTime.UtcNow
+                    NgayKhoiTao = DateTime.UtcNow,
+                    MaNguoiNhap = user.MaNguoiDung,
+                    TenNguoiNhap = user.TenNguoiDung
                 };
                 context.DmThongSoThietBis.Add(entity);
             }
@@ -692,6 +733,7 @@ namespace QlThietBi.Businesses.ThietBi
 
         public async Task<bool> XoaThongSoThietBiAsync(int id)
         {
+            var user = GetCurrentUser();
             var entity = await context.DmThongSoThietBis.FindAsync(id);
             if (entity == null)
             {
@@ -700,12 +742,15 @@ namespace QlThietBi.Businesses.ThietBi
 
             entity.IsActive = false;
             entity.NgayChinhSuaCuoiCung = DateTime.UtcNow;
+            entity.MaNguoiChinhSua = user.MaNguoiDung;
+            entity.TenNguoiChinhSua = user.TenNguoiDung;
             await context.SaveChangesAsync();
             return true;
         }
 
         public async Task<PhieuThietBiDto> TaoPhieuThietBiAsync(CreatePhieuThietBiRequest request)
         {
+            var user = GetCurrentUser();
             var thietBi = await context.ThietBis.FindAsync(request.ThietBiId) ?? throw new KeyNotFoundException("Thiết bị không tồn tại.");
             var now = DateTime.UtcNow;
             var phieu = new PhieuThietBi
@@ -725,7 +770,9 @@ namespace QlThietBi.Businesses.ThietBi
                 FileScan02 = request.FileScan02,
                 GhiChu = request.GhiChu,
                 IsActive = true,
-                NgayKhoiTao = now
+                NgayKhoiTao = now,
+                MaNguoiNhap = user.MaNguoiDung,
+                TenNguoiNhap = user.TenNguoiDung
             };
 
             context.PhieuThietBis.Add(phieu);
@@ -746,7 +793,9 @@ namespace QlThietBi.Businesses.ThietBi
                         NgayBatDau = detail.NgayBatDau,
                         NgayKetThuc = detail.NgayKetThuc,
                         GhiChu = detail.GhiChu,
-                        NgayKhoiTao = now
+                        NgayKhoiTao = now,
+                        MaNguoiNhap = user.MaNguoiDung,
+                        TenNguoiNhap = user.TenNguoiDung
                     };
 
                     context.PhieuThietBiChiTiets.Add(detailEntry);
@@ -793,6 +842,8 @@ namespace QlThietBi.Businesses.ThietBi
             }
 
             thietBi.NgayChinhSuaCuoiCung = now;
+            thietBi.MaNguoiChinhSua = user.MaNguoiDung;
+            thietBi.TenNguoiChinhSua = user.TenNguoiDung;
             await TaoLichSuThietBiAsync(thietBi, new CreateUpdateThietBiRequest
             {
                 MaThietBi = thietBi.MaThietBi,
@@ -872,6 +923,8 @@ namespace QlThietBi.Businesses.ThietBi
                 return;
             }
 
+            var user = GetCurrentUser();
+
             foreach (var item in values)
             {
                 var existing = await context.ThietBiThongSos
@@ -888,7 +941,9 @@ namespace QlThietBi.Businesses.ThietBi
                         GiaTriDate = item.GiaTriDate,
                         GiaTriBit = item.GiaTriBit,
                         GhiChu = item.GhiChu,
-                        NgayKhoiTao = now
+                        NgayKhoiTao = now,
+                        MaNguoiNhap = user.MaNguoiDung,
+                        TenNguoiNhap = user.TenNguoiDung
                     });
                 }
                 else
@@ -923,9 +978,17 @@ namespace QlThietBi.Businesses.ThietBi
                 NgayPhatSinh = now,
                 NgayKhoiTao = now
             };
+            var user = GetCurrentUser();
+            history.MaNguoiNhap = user.MaNguoiDung;
+            history.TenNguoiNhap = user.TenNguoiDung;
 
             context.LichSuThietBis.Add(history);
             return Task.CompletedTask;
+        }
+
+        private LoggedInUser GetCurrentUser()
+        {
+            return authenInfo.Get() ?? throw new UnauthorizedAccessException("Chưa đăng nhập hoặc token không hợp lệ.");
         }
 
         private async Task<int> LayTrangThaiIdAsync(string nhomDanhMuc, string ma)

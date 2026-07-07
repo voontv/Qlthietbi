@@ -76,7 +76,6 @@ namespace QlThietBi
                 .AllowAnyHeader()
                 .SetIsOriginAllowed(CheckAllowOrigin) // allow any origin
                 .AllowCredentials()); // allow credentials
-            app.UseMiddleware<TokenProviderMiddleware>();
             //app.UseMiddleware<AdminSafeListMiddleware>(Configuration["AdminSafeList"]);
             //keep
             //app.UseMiddleware<TokenProviderMiddleware>();
@@ -84,6 +83,8 @@ namespace QlThietBi
             app.UseSession();
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseMiddleware<TokenProviderMiddleware>();
             app.UseAuthorization();
 
             //swagger

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QlThietBi.Businesses.NguoiSuDungThietBi;
 using QlThietBi.DTO.Request;
@@ -68,6 +69,7 @@ namespace QlThietBi.Controllers
         /// }
         /// </remarks>
         /// <response code="200">Người sử dụng được lưu.</response>
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(NguoiSuDungThietBiDto), 200)]
         public async Task<ActionResult<NguoiSuDungThietBiDto>> SaveUser(CreateUpdateNguoiSuDungThietBiRequest request)
@@ -81,6 +83,7 @@ namespace QlThietBi.Controllers
         /// </summary>
         /// <response code="204">Xóa thành công.</response>
         /// <response code="404">Không tìm thấy người sử dụng.</response>
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]

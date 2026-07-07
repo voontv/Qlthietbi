@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QlThietBi.Businesses.TepDinhKem;
 using QlThietBi.DTO.Request;
@@ -69,6 +70,7 @@ namespace QlThietBi.Controllers
         /// }
         /// </remarks>
         /// <response code="200">Tệp đính kèm được lưu và trả về dữ liệu.</response>
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(typeof(TepDinhKemDto), 200)]
         public async Task<ActionResult<TepDinhKemDto>> SaveAttachment(CreateUpdateTepDinhKemRequest request)
@@ -83,6 +85,7 @@ namespace QlThietBi.Controllers
         /// <param name="id">Id tệp đính kèm cần xóa.</param>
         /// <response code="204">Xóa thành công.</response>
         /// <response code="404">Không tìm thấy tệp đính kèm.</response>
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]

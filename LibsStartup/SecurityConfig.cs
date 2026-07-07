@@ -20,7 +20,7 @@ namespace QlThietBi.LibsStartup
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuer = false,
                 ValidateAudience = false,
-                ValidateLifetime = false,
+                ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero,
             };
             options.SaveToken = true;
