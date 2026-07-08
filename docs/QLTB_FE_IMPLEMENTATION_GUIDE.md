@@ -71,20 +71,37 @@ FE should load lookup lists first, then map IDs to names:
 GET /api/ThietBi/nhom-thiet-bi
 GET /api/ThietBi/danh-muc/TRANG_THAI_TB
 GET /api/DonViBoPhan
+GET /api/DonViBoPhan/phong-ban/{ma_phong_ban}/bo-phan
 GET /api/NguoiSuDungThietBi
 ```
+
+For department/section filters:
+
+- Department options are active `DonViBoPhan` rows with `parent_id = null`.
+- When FE selects a department, call `GET /api/DonViBoPhan/phong-ban/{ma_phong_ban}/bo-phan`, using the selected department's `ma_don_vi`.
+- If the API returns an empty array, keep the section/part select disabled and visually muted.
+- Statistic search still sends `phong_ban_id` and `bo_phan_id` as int IDs.
 
 For dashboard statistics and filtered search, prefer:
 
 ```http
 GET /api/ThietBi/thiet-bi/thong-ke
+GET /api/ThietBi/thiet-bi/thong-ke?ma_thiet_bi={text}
 GET /api/ThietBi/thiet-bi/thong-ke?phong_ban_id={int}
 GET /api/ThietBi/thiet-bi/thong-ke?bo_phan_id={int}
 GET /api/ThietBi/thiet-bi/thong-ke?nhom_thiet_bi_id={int}
-GET /api/ThietBi/thiet-bi/thong-ke?phong_ban_id={int}&bo_phan_id={int}&nhom_thiet_bi_id={int}
+GET /api/ThietBi/thiet-bi/thong-ke?nguoi_su_dung_id={int}
+GET /api/ThietBi/thiet-bi/thong-ke?nguoi_su_dung={text}
+GET /api/ThietBi/thiet-bi/thong-ke?trang_thai_id={int}
+GET /api/ThietBi/thiet-bi/thong-ke?tinh_trang_thiet_bi_id={int}
+GET /api/ThietBi/thiet-bi/thong-ke?ngay_nhap_tu=2026-01-01&ngay_nhap_den=2026-12-31
+GET /api/ThietBi/thiet-bi/thong-ke?ngay_dua_vao_su_dung_tu=2026-01-01&ngay_dua_vao_su_dung_den=2026-12-31
+GET /api/ThietBi/thiet-bi/thong-ke?phong_ban_id={int}&bo_phan_id={int}&nhom_thiet_bi_id={int}&trang_thai_id={int}
 ```
 
 All query params are optional. If FE does not send a param, BE treats that filter as "all".
+
+Date filters are inclusive by calendar day. If a date filter is sent, devices with null value in that date field are not matched by that date condition.
 
 When `nhom_thiet_bi_id` is a parent group, BE includes devices in that parent group and its direct child groups.
 
@@ -93,6 +110,13 @@ Main response fields:
 - `phong_ban_id`
 - `bo_phan_id`
 - `nhom_thiet_bi_id`
+- `nguoi_su_dung_id`
+- `nguoi_su_dung`
+- `trang_thai_id`
+- `ngay_nhap_tu`
+- `ngay_nhap_den`
+- `ngay_dua_vao_su_dung_tu`
+- `ngay_dua_vao_su_dung_den`
 - `tong_so_luong`
 - `tong_nguyen_gia`
 - `theo_phong_ban`
@@ -154,6 +178,7 @@ GET /api/ThietBi/danh-muc/NUOC_SAN_XUAT
 GET /api/ThietBi/danh-muc/CHAT_LIEU
 GET /api/ThietBi/danh-muc/DON_VI_CUNG_CAP
 GET /api/DonViBoPhan
+GET /api/DonViBoPhan/phong-ban/{ma_phong_ban}/bo-phan
 GET /api/NguoiSuDungThietBi
 ```
 

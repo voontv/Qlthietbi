@@ -301,10 +301,11 @@ namespace QlThietBi.Controllers
         }
 
         /// <summary>
-        /// Thống kê và tìm kiếm thiết bị theo phòng ban, bộ phận, nhóm thiết bị.
+        /// Thống kê và tìm kiếm thiết bị theo mã thiết bị, người sử dụng, tình trạng, phòng ban, bộ phận, nhóm thiết bị và khoảng ngày.
         /// </summary>
         /// <remarks>
-        /// Không truyền tham số nào thì xem như lấy tất cả.
+        /// Không truyền tham số nào, hoặc tham số null/rỗng, thì xem như lấy tất cả theo tiêu chí đó.
+        /// Các tham số ngày hỗ trợ: ngay_nhap_tu, ngay_nhap_den, ngay_dua_vao_su_dung_tu, ngay_dua_vao_su_dung_den.
         /// Nếu truyền nhóm thiết bị cha thì thống kê cả các nhóm con trực thuộc.
         /// </remarks>
         /// <param name="request">Bộ lọc thống kê.</param>

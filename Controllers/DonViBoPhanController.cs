@@ -33,6 +33,19 @@ namespace QlThietBi.Controllers
         }
 
         /// <summary>
+        /// Lấy danh sách bộ phận con theo mã phòng ban cha.
+        /// </summary>
+        /// <param name="maPhongBan">Mã phòng ban cha, là đơn vị có ParentId null.</param>
+        /// <response code="200">Danh sách bộ phận con. Nếu phòng ban không có bộ phận thì trả mảng rỗng.</response>
+        [HttpGet("phong-ban/{maPhongBan}/bo-phan")]
+        [ProducesResponseType(typeof(IEnumerable<DonViBoPhanDto>), 200)]
+        public async Task<ActionResult<IEnumerable<DonViBoPhanDto>>> GetPartsByDepartmentCode(string maPhongBan)
+        {
+            var result = await business.GetPartsByDepartmentCodeAsync(maPhongBan);
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Lấy chi tiết đơn vị / bộ phận theo Id.
         /// </summary>
         /// <param name="id">Id của đơn vị / bộ phận.</param>

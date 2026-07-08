@@ -11,6 +11,7 @@ namespace QlThietBi.Businesses.DonViBoPhan
     public interface IDonViBoPhanBusiness
     {
         Task<IEnumerable<DonViBoPhanDto>> GetUnitsAsync();
+        Task<IEnumerable<DonViBoPhanDto>> GetPartsByDepartmentCodeAsync(string maPhongBan);
         Task<DonViBoPhanDto?> GetUnitByIdAsync(int id);
         Task<DonViBoPhanDto> SaveUnitAsync(CreateUpdateDonViBoPhanRequest request);
         Task<bool> DeleteUnitAsync(int id);

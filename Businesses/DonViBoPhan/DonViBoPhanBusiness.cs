@@ -39,6 +39,42 @@ namespace QlThietBi.Businesses.DonViBoPhan
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<DonViBoPhanDto>> GetPartsByDepartmentCodeAsync(string maPhongBan)
+        {
+            if (string.IsNullOrWhiteSpace(maPhongBan))
+            {
+                return Enumerable.Empty<DonViBoPhanDto>();
+            }
+
+            var code = maPhongBan.Trim();
+            var department = await context.DonViBoPhans
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.IsActive && x.ParentId == null && x.MaDonVi == code);
+
+            if (department == null)
+            {
+                return Enumerable.Empty<DonViBoPhanDto>();
+            }
+
+            return await context.DonViBoPhans
+                .AsNoTracking()
+                .Where(x => x.IsActive && x.ParentId == department.Id)
+                .OrderBy(x => x.SapXep)
+                .ThenBy(x => x.TenDonVi)
+                .Select(x => new DonViBoPhanDto
+                {
+                    Id = x.Id,
+                    MaDonVi = x.MaDonVi,
+                    TenDonVi = x.TenDonVi,
+                    ParentId = x.ParentId,
+                    LoaiDonVi = x.LoaiDonVi,
+                    GhiChu = x.GhiChu,
+                    SapXep = x.SapXep,
+                    IsActive = x.IsActive
+                })
+                .ToListAsync();
+        }
+
         public async Task<DonViBoPhanDto?> GetUnitByIdAsync(int id)
         {
             var entity = await context.DonViBoPhans.FindAsync(id);

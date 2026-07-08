@@ -44,9 +44,17 @@ namespace QlThietBi.DTO.Response
 
     public class ThongKeThietBiDto
     {
+        public string? MaThietBi { get; set; }
         public int? PhongBanId { get; set; }
         public int? BoPhanId { get; set; }
         public int? NhomThietBiId { get; set; }
+        public int? NguoiSuDungId { get; set; }
+        public string? NguoiSuDung { get; set; }
+        public int? TrangThaiId { get; set; }
+        public DateTime? NgayNhapTu { get; set; }
+        public DateTime? NgayNhapDen { get; set; }
+        public DateTime? NgayDuaVaoSuDungTu { get; set; }
+        public DateTime? NgayDuaVaoSuDungDen { get; set; }
         public int TongSoLuong { get; set; }
         public decimal TongNguyenGia { get; set; }
         public IEnumerable<ThongKeThietBiNhomDto> TheoPhongBan { get; set; } = new List<ThongKeThietBiNhomDto>();

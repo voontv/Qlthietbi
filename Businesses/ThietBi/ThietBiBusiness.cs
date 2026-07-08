@@ -271,6 +271,14 @@ namespace QlThietBi.Businesses.ThietBi
             var query = context.ThietBis
                 .Where(x => x.IsActive);
 
+            var maThietBi = request.MaThietBi?.Trim();
+            if (!string.IsNullOrWhiteSpace(maThietBi))
+            {
+                query = query.Where(x =>
+                    x.MaThietBi.Contains(maThietBi) ||
+                    (x.MaThietBiCu != null && x.MaThietBiCu.Contains(maThietBi)));
+            }
+
             if (request.PhongBanId.HasValue)
             {
                 query = query.Where(x => x.PhongBanId == request.PhongBanId.Value);
@@ -294,6 +302,54 @@ namespace QlThietBi.Businesses.ThietBi
                 }
 
                 query = query.Where(x => nhomIds.Contains(x.NhomThietBiId));
+            }
+
+            if (request.NguoiSuDungId.HasValue)
+            {
+                query = query.Where(x => x.NguoiSuDungId == request.NguoiSuDungId.Value);
+            }
+
+            var nguoiSuDung = request.NguoiSuDung?.Trim();
+            if (!string.IsNullOrWhiteSpace(nguoiSuDung))
+            {
+                var nguoiSuDungIds = await context.NguoiSuDungThietBis
+                    .Where(x =>
+                        x.IsActive &&
+                        (x.MaNguoiDung.Contains(nguoiSuDung) || x.TenNguoiDung.Contains(nguoiSuDung)))
+                    .Select(x => x.Id)
+                    .ToListAsync();
+
+                query = query.Where(x => x.NguoiSuDungId.HasValue && nguoiSuDungIds.Contains(x.NguoiSuDungId.Value));
+            }
+
+            var trangThaiId = request.TrangThaiId ?? request.TinhTrangThietBiId;
+            if (trangThaiId.HasValue)
+            {
+                query = query.Where(x => x.TrangThaiId == trangThaiId.Value);
+            }
+
+            if (request.NgayNhapTu.HasValue)
+            {
+                var ngayNhapTu = request.NgayNhapTu.Value.Date;
+                query = query.Where(x => x.NgayNhapThietBi.HasValue && x.NgayNhapThietBi.Value >= ngayNhapTu);
+            }
+
+            if (request.NgayNhapDen.HasValue)
+            {
+                var ngayNhapDen = request.NgayNhapDen.Value.Date.AddDays(1);
+                query = query.Where(x => x.NgayNhapThietBi.HasValue && x.NgayNhapThietBi.Value < ngayNhapDen);
+            }
+
+            if (request.NgayDuaVaoSuDungTu.HasValue)
+            {
+                var ngayDuaVaoSuDungTu = request.NgayDuaVaoSuDungTu.Value.Date;
+                query = query.Where(x => x.NgayDuaVaoSuDung.HasValue && x.NgayDuaVaoSuDung.Value >= ngayDuaVaoSuDungTu);
+            }
+
+            if (request.NgayDuaVaoSuDungDen.HasValue)
+            {
+                var ngayDuaVaoSuDungDen = request.NgayDuaVaoSuDungDen.Value.Date.AddDays(1);
+                query = query.Where(x => x.NgayDuaVaoSuDung.HasValue && x.NgayDuaVaoSuDung.Value < ngayDuaVaoSuDungDen);
             }
 
             var devices = await query
@@ -369,9 +425,17 @@ namespace QlThietBi.Businesses.ThietBi
 
             var result = new ThongKeThietBiDto
             {
+                MaThietBi = maThietBi,
                 PhongBanId = request.PhongBanId,
                 BoPhanId = request.BoPhanId,
                 NhomThietBiId = request.NhomThietBiId,
+                NguoiSuDungId = request.NguoiSuDungId,
+                NguoiSuDung = nguoiSuDung,
+                TrangThaiId = trangThaiId,
+                NgayNhapTu = request.NgayNhapTu,
+                NgayNhapDen = request.NgayNhapDen,
+                NgayDuaVaoSuDungTu = request.NgayDuaVaoSuDungTu,
+                NgayDuaVaoSuDungDen = request.NgayDuaVaoSuDungDen,
                 TongSoLuong = devices.Count,
                 TongNguyenGia = devices.Sum(x => x.NguyenGia ?? 0),
                 TheoPhongBan = devices
