@@ -1,6 +1,6 @@
 # QLTB Working State
 
-Last updated: 2026-07-02
+Last updated: 2026-07-10
 
 ## Project Context
 
@@ -351,6 +351,74 @@ WTB_05_NHAP_KHO_THIET_BI source rows: 0
 History import is intentionally direct SQL, not through business methods, so it does not rewrite the current equipment status/location from the old final profile. `PhieuThietBi` stores the old business record, and `LichSuThietBi.NghiepVuId` points to the imported `PhieuThietBi.Id`.
 
 ## Build/Test Status
+
+## BGD 2026 Requirement Analysis State
+
+Updated on: 2026-07-10
+
+Current analysis folder:
+
+```text
+docs/QLTB_YEU_CAU_MOI_BGD_2026/docs/yeu-cau-moi-2026/_codex-analysis/
+```
+
+Analysis files created/updated:
+
+```text
+01-HIEN-TRANG-LIEN-QUAN.md
+02-DOI-CHIEU-YEU-CAU-MOI.md
+03-CAC-HUONG-TRIEN-KHAI.md
+04-HUONG-DE-XUAT.md
+05-CAU-HOI-CAN-CHOT.md
+```
+
+Important instruction for this analysis round:
+
+- This round is analysis only.
+- No code change.
+- No database change.
+- No migration.
+- Stop after documenting and wait for business discussion.
+
+Business/design decisions already agreed:
+
+- Use direction 2 from the analysis: keep `PhieuThietBi` as the common business slip foundation, add auxiliary tables only where the new workflow really needs separate data.
+- Each `PhieuThietBi` handles exactly one `ThietBi`.
+- Do not design one `PhieuThietBi` containing multiple devices.
+- `PhieuThietBiChiTiet` stores only work lines, performed content, cost, time, parameter/detail values for the single device on that slip.
+- Device parent/child is a relationship between `ThietBi` records.
+- A child device is still an independent `ThietBi` and can have its own malfunction report, repair, maintenance, replacement, recall, and history.
+- Tables/screens in the BGD document that show many devices should be treated as reports or aggregated dossiers, not as one operational slip containing many devices.
+
+Device identifier decision:
+
+- Keep `ThietBi.Id` as the technical primary key for internal access, joins, FK references, and API operations.
+- `ThietBi.MaThietBi` is the business equipment code, stored as string / SQL Server `nvarchar(50)`.
+- `ThietBi.MaThietBiCha` is the parent equipment code, stored as string / SQL Server `nvarchar(50)`.
+- Do not change `MaThietBi` to the physical primary key.
+- Do not add or recommend `ThietBiChaId int?` as the parent relationship.
+- If FE needs a device tree, add API/query by `MaThietBiCha`.
+
+Current code observations related to the decision:
+
+- `Models/ThietBi.cs` has `MaThietBi`, `MaThietBiCu`, and `MaThietBiCha`.
+- `Models/QlThietBiContext.cs` configures `MaThietBi` and `MaThietBiCha` with `HasMaxLength(50)`.
+- Current code still checks duplicate `MaThietBi` in `ThietBiBusiness.LuuThietBiAsync`.
+- Current EF config still has a unique index on `ThietBi.MaThietBi`: `IX_ThietBi_MaThietBi`.
+- These code/database constraints were only observed in this round, not changed.
+
+Current recommendation:
+
+- Keep the existing BE/database code until implementation phase is approved.
+- When implementation starts, decide explicitly whether to keep or remove duplicate checks/unique index for `MaThietBi`.
+- For the BGD workflow, prioritize: status workflow, malfunction report, source slip to handling slip relation, acceptance/ nghiệm thu, replacement handling, periodic maintenance plan if needed, approval roles, and BGD aggregate report/dossier.
+
+Suggested next implementation direction after discussion:
+
+1. Chốt nghiệp vụ and update `05-CAU-HOI-CAN-CHOT.md` if new decisions are made.
+2. Design minimal schema changes for workflow, still keeping one slip per one device.
+3. Add APIs in small slices: report malfunction, inspect/propose handling, create handling slip, approve, accept/close, device history, aggregate reports.
+4. Update FE after BE workflow contracts are stable.
 
 Build command:
 
